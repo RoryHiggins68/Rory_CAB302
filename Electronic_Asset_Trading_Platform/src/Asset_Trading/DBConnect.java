@@ -48,7 +48,7 @@ public class DBConnect{
                     + "Credits VARCHAR(15)" + ");";
 
     public static final String CREATE_SHOP_HISTORY_TABLE =
-            "CREATE TABLE IF NOT EXISTS Shop ("
+            "CREATE TABLE IF NOT EXISTS ShopHistory ("
                     + "idx INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */ NOT NULL UNIQUE," // from https://stackoverflow.com/a/41028314
                     + "Asset VARCHAR(15),"
                     + "BuyTeam VARCHAR(15),"
@@ -115,8 +115,23 @@ public class DBConnect{
         ResultSet resultSet = statement.executeQuery("select * from Shop;");
 
         //resultSet.next();
+        if(resultSet.isClosed())
+            System.out.println("ThE RESULT WAS CLOSED, might be empty");
 
-        for (int i = 0; i < Nth; i++) {resultSet.next();}
+
+
+
+        for (int i = 0; i < Nth; i++) {
+            resultSet.next();
+//            String indx = resultSet.getString(1);
+//            String N = String.valueOf(Nth);
+//
+//            if(indx.equals(N)){
+//                i = Nth;
+//            }
+        }
+
+
         String Asset = resultSet.getString(2);
         return Asset;
     }
@@ -184,6 +199,45 @@ public class DBConnect{
         return team;
 
     }
+
+
+    public static String getShopHisAsset(Connection connection, int Nth ) throws SQLException {
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from ShopHistory;");
+
+        for (int i = 0; i < Nth; i++) {resultSet.next();}
+        String Asset = resultSet.getString(2);
+        return Asset;
+    }
+    public static String getShopHisBuyTeam(Connection connection, int Nth ) throws SQLException {
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from ShopHistory;");
+
+        for (int i = 0; i < Nth; i++) {resultSet.next();}
+        String BuyTeam = resultSet.getString(3);
+        return BuyTeam;
+
+    }
+    public static String getShopHisSellTeam(Connection connection, int Nth ) throws SQLException {
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from ShopHistory;");
+
+        for (int i = 0; i < Nth; i++) {resultSet.next();}
+        String SellTeam = resultSet.getString(4);
+        return SellTeam;
+    }
+    public static String getShopHisPrice(Connection connection, int Nth )throws SQLException {
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from ShopHistory;");
+
+        for (int i = 0; i < Nth; i++) {resultSet.next();}
+        String Price = resultSet.getString(5);
+        return Price;
+    }
+
+
+
+
     public static int getCredits(Connection connection, String  UserName){
 /*
         String uName;
@@ -516,12 +570,9 @@ public class DBConnect{
 
     }
     public static void addShopHistoryItem(Connection connection, String Asset, String BuyTeam, String SellTeam, String Price) throws SQLException {
-        String INSERT_SHOPHISTORY = "INSERT INTO Team (TeamName, TeamLeader, Credits) VALUES (?, ?, ?,?);";
-
-
+        String INSERT_SHOPHISTORY = "INSERT INTO ShopHistory (Asset, BuyTeam, SellTeam, Price) VALUES (?, ?, ?, ?);";
 
         PreparedStatement addShopHistoryItem = connection.prepareStatement(INSERT_SHOPHISTORY);
-
 
         addShopHistoryItem.setString(1, Asset);
         addShopHistoryItem.setString(2, BuyTeam);

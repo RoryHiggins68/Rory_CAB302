@@ -12,26 +12,24 @@ import java.sql.SQLException;
 
 public class ClientGUI {
     private static Object ButtonListener;
-
-    private static JButton newUserbutton;
-    private static JButton submit;
+    private static Connection connection;
     private static JTextField firstname;
     private static JTextField lastname;
     private static JTextField username;
     private static JTextField team;
-    private static Connection connection;
-
     private static JTextField assetName;
     private static JTextField BuySell;
     private static JTextField Price;
-
     private static JComboBox BuyorSell;
     private static JComboBox TeamOption;
-    private static String buyorsell;
-    private static String teamop;
+    private static JButton newUserbutton;
+    private static JButton submit;
     private static JButton submitNewSale;
     private static JButton newSale;
     private static JButton ViewTeamsItems;
+    private static JButton PurchaseHistory;
+    private static String buyorsell;
+    private static String teamop;
     private static String userName;
     private static String Team;
     private static int credits;
@@ -69,7 +67,7 @@ public class ClientGUI {
 
         newSale = new JButton("Post new sale");
         ViewTeamsItems = new JButton("View teams items");
-        JButton PurchaseHistory = new JButton("Purchase History");
+        PurchaseHistory = new JButton("Purchase History");
         JButton filterItems = new JButton("Filter Items");
         JButton resetItems = new JButton("Reset Items");
         JButton Details = new JButton("Details");
@@ -95,6 +93,7 @@ public class ClientGUI {
         newUserbutton.addActionListener(new ButtonListener());
         newSale.addActionListener(new ButtonListener());
         ViewTeamsItems.addActionListener(new ButtonListener());
+        PurchaseHistory.addActionListener(new ButtonListener());
 
         newSale.setPreferredSize(dimension);
 
@@ -298,7 +297,7 @@ public class ClientGUI {
 
     public static void teamitems() throws SQLException {
 
-        String team = "B";
+        String team = Team;
 
         JFrame frame = new JFrame("Teams Items");
         //JPanel teamitempanel = new JPanel();
@@ -350,6 +349,62 @@ public class ClientGUI {
 
 
     };
+
+    public static void SaleHistory() throws SQLException {
+
+        String team = Team;
+
+        JFrame frame = new JFrame("Sale History");
+        //JPanel teamitempanel = new JPanel();
+        //frame.add(teamitempanel);
+
+
+        int num = DBConnect.numRows(connection);
+        num = 4;
+        JPanel teamsitems = new JPanel(new GridLayout(num, 1));
+        JScrollPane teamsitemsscroll = new JScrollPane(teamsitems);
+
+        frame.add((teamsitemsscroll));
+        teamsitemsscroll.setVisible(true);
+        teamsitemsscroll.createVerticalScrollBar();
+
+
+        JPanel[] itempanels = new JPanel[num];
+        JLabel[] assetname = new JLabel[num];
+        Dimension saleitem = new Dimension(350, 45);
+
+
+        for (int i = 0; i < 4; i++) {
+
+            String itemTeam = DBConnect.getNthTeam(connection,i+1 );
+
+            //if (itemTeam == team){
+            //if (itemTeam.equals(team)){
+
+                itempanels[i] = new JPanel();
+                String Asset = DBConnect.getShopHisAsset(connection,i+1 );
+                String BuyTeam = DBConnect.getShopHisBuyTeam(connection,i+1 );
+                String SellTeam = DBConnect.getShopHisSellTeam(connection,i+1);
+                String Price = DBConnect.getShopHisPrice(connection,i+1);
+
+                String alltogether = ("The "+BuyTeam+" team bought "+Asset+" from "+SellTeam+" for " + Price +" Credits");
+                assetname[i] = new JLabel(alltogether);
+                Border blackline = BorderFactory.createLineBorder(Color.black);
+                itempanels[i].setBorder(blackline);
+                itempanels[i].add(assetname[i]);
+                itempanels[i].setPreferredSize(saleitem);
+                teamsitems.add(itempanels[i]);
+
+
+        }
+
+
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
+
+    }
 
     public static void main(String[] args) throws SQLException {
         String userName = "bob_smith";
@@ -425,7 +480,21 @@ public class ClientGUI {
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
+            }else if(source == PurchaseHistory ){
+                try {
+                    showteamPurchaseHistory();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
+
+        }
+
+        private void showteamPurchaseHistory() throws SQLException {
+            ClientGUI PurchaseHistory = new ClientGUI();
+            PurchaseHistory.SaleHistory();
+
+
         }
 
         private void showteamitems() throws SQLException {
