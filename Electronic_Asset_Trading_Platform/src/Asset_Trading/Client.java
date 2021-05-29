@@ -18,6 +18,7 @@ import java.sql.SQLException;
 
 public class Client {
 
+    private static JFrame frame;
     private static JButton Login;
     private static JTextField UserName;
     private static JTextField Password;
@@ -35,7 +36,7 @@ public class Client {
     public static void showClientGUI() throws SQLException {
 
         //set up window
-        JFrame frame = new JFrame("Login");
+        frame = new JFrame("Login");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         frame.setPreferredSize(new Dimension(400, 300));
@@ -72,7 +73,7 @@ public class Client {
 
     }
 
-    public static void Clientrequest(String userName, String password) throws IOException, ClassNotFoundException {
+    public static void Clientrequest(String userName, String password) throws IOException, ClassNotFoundException, SQLException {
 
         Socket socket = new Socket("127.0.0.1", 12345);
         ServerSocket serverSocket = new ServerSocket();
@@ -89,6 +90,11 @@ public class Client {
         int login = (int) objectInputStream.readObject();
         if (login == 1){
             JOptionPane.showMessageDialog(null, "Username or password correct, logging in");
+            frame.setVisible(false);
+            frame.dispose();
+
+            ClientGUI ClientShop = new ClientGUI();
+            ClientShop.showClientGUI(userName);
 
 
         }else{

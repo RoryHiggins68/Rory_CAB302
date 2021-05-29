@@ -40,6 +40,22 @@ public class DBConnect{
                     + "Details VARCHAR(30)" + ");";
 
 
+    public static final String CREATE_TEAM_TABLE =
+            "CREATE TABLE IF NOT EXISTS Team ("
+                    + "idx INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */ NOT NULL UNIQUE," // from https://stackoverflow.com/a/41028314
+                    + "TeamName VARCHAR(15),"
+                    + "TeamLeader VARCHAR(15),"
+                    + "Credits VARCHAR(15)" + ");";
+
+    public static final String CREATE_SHOP_HISTORY_TABLE =
+            "CREATE TABLE IF NOT EXISTS Shop ("
+                    + "idx INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */ NOT NULL UNIQUE," // from https://stackoverflow.com/a/41028314
+                    + "Asset VARCHAR(15),"
+                    + "BuyTeam VARCHAR(15),"
+                    + "SellTeam VARCHAR(15),"
+                    + "Price VARIANT(15)" + ");";
+
+
     private static Connection connection = null;
 
     //public static void main(String[] args) throws SQLException, IOException {
@@ -150,6 +166,45 @@ public class DBConnect{
 
         return Asset;
     }
+    public static String getTeam(Connection connection, String  UserName) throws SQLException {
+
+        String team = " ";
+        String uName;
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from Users;");
+
+        for (int i = 0; i < 5; i++) {
+            resultSet.next();
+            uName = resultSet.getString(4);
+            if (uName.equals(UserName)) {
+                team = resultSet.getString(6);
+                return team;
+            }
+        }
+        return team;
+
+    }
+    public static int getCredits(Connection connection, String  UserName){
+/*
+        String uName;
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from Users;");
+
+
+        for (int i = 0; i < 5; i++) {
+            resultSet.next();
+            uName = resultSet.getString(4);
+            if (uName.equals(UserName)) {
+                team = resultSet.getString(6);
+                return team;
+
+            }
+        }
+*/
+        return 2500;
+
+
+    }
     public static int numRows(Connection connection) throws SQLException{
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from Shop;");
@@ -202,6 +257,22 @@ public class DBConnect{
         firstName = "Jack";
         lastName = "John";
         Username = "John_j";
+        Password = "password";
+        Team = "A";
+
+        addUser(connection, firstName,lastName,Username,Password,Team);
+
+        firstName = "rob";
+        lastName = "Jo";
+        Username = "rob_jo";
+        Password = "password";
+        Team = "A";
+
+        addUser(connection, firstName,lastName,Username,Password,Team);
+
+        firstName = "mat";
+        lastName = "J";
+        Username = "mat_j";
         Password = "password";
         Team = "A";
 
@@ -274,7 +345,7 @@ public class DBConnect{
         Price = "1000";
         Details = "CPU time on one of the servers to used for what ever the user needs";
 
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price);
+        //addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price);
 
         addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price);
         Asset = "Lazering";
@@ -299,6 +370,8 @@ public class DBConnect{
         Price = "150";
         Details = "CPU time on one of the servers to used for what ever the user needs";
 
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price);
+
         Asset = "Proof reading";
         TeamRequest = "A";
         BuyOrSell = "Sell";
@@ -321,6 +394,36 @@ public class DBConnect{
 
         addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price);
 
+        Team = "great";
+        String TeamLeader = "bob_sm";
+        String Credits = "1200";
+
+        addTeam(connection, Team, TeamLeader,Credits );
+
+        Team = "A";
+        TeamLeader = "bob_smith";
+        Credits = "1200";
+
+        addTeam(connection, Team, TeamLeader,Credits );
+
+        Team = "B";
+        TeamLeader = "John_j";
+        Credits = "1500";
+
+        addTeam(connection, Team, TeamLeader,Credits );
+
+        Team = "C";
+        TeamLeader = "jane_smith";
+        Credits = "1500";
+
+        addTeam(connection, Team, TeamLeader,Credits );
+
+        Team = "C";
+        TeamLeader = "j";
+        Credits = "1500";
+
+        addTeam(connection, Team, TeamLeader,Credits );
+
 
 
     }
@@ -330,9 +433,11 @@ public class DBConnect{
         st.execute(CREATE_USER_TABLE);
         st.execute(CREATE_ASSET_TABLE);
         st.execute(CREATE_SHOP_TABLE);
+        st.execute(CREATE_TEAM_TABLE);
+        st.execute(CREATE_SHOP_HISTORY_TABLE);
 
     }
-    static void addAsset(Connection connection,String AssetName, String HighPrice, String LowPrice, String Description) throws SQLException {
+    public static void addAsset(Connection connection,String AssetName, String HighPrice, String LowPrice, String Description) throws SQLException {
         String INSERT_ASSET = "INSERT INTO Assets (AssetName, HighPrice, LowPrice, Description) VALUES (?, ?, ?, ?);";
 
         PreparedStatement addAsset = connection.prepareStatement(INSERT_ASSET);
@@ -346,7 +451,7 @@ public class DBConnect{
         addAsset.execute();
 
     }
-    static void addItemToShop(Connection connection,String Asset, String TeamRequest, String BuyOrSell, String Price) throws SQLException{
+    public static void addItemToShop(Connection connection,String Asset, String TeamRequest, String BuyOrSell, String Price) throws SQLException{
         String INSERT_SHOPITEM = "INSERT INTO Shop (Asset, TeamRequest, BuyOrSell, Price, Details) VALUES (?, ?, ?, ?, ?);";
         PreparedStatement addShopItem = connection.prepareStatement(INSERT_SHOPITEM);
 
@@ -360,7 +465,7 @@ public class DBConnect{
         addShopItem.execute();
 
     }
-    static void addUser(Connection connection, User U) throws SQLException{
+    public static void addUser(Connection connection, User U) throws SQLException{
 
         String INSERT_USER = "INSERT INTO Users (FirstName, LastName, UserName, Password, Team) VALUES (?, ?, ?, ?, ?);";
 
@@ -376,7 +481,7 @@ public class DBConnect{
 
 
     }
-    static void addUser(Connection connection, String firstName, String lastName, String Username, String Password, String Team) throws SQLException {
+    public static void addUser(Connection connection, String firstName, String lastName, String Username, String Password, String Team) throws SQLException {
 
 
 
@@ -393,7 +498,38 @@ public class DBConnect{
         addUser.execute();
 
     }
-    static void removeItemFromShop(Connection connectionOrSell, int index) throws SQLException{
+    public static void addTeam(Connection connection, String TeamName, String TeamLeader, String Credits) throws SQLException {
+
+        String INSERT_TEAM = "INSERT INTO Team (TeamName, TeamLeader, Credits) VALUES (?, ?, ?);";
+
+        PreparedStatement addTeam = connection.prepareStatement(INSERT_TEAM);
+
+        addTeam.setString(1, TeamName);
+        addTeam.setString(2, TeamLeader);
+        addTeam.setString(3, Credits);
+
+        if(userExists(connection, TeamLeader)){
+            addTeam.execute();
+        }else{
+            System.out.println("No such user ");
+        }
+
+    }
+    public static void addShopHistoryItem(Connection connection, String Asset, String BuyTeam, String SellTeam, String Price) throws SQLException {
+        String INSERT_SHOPHISTORY = "INSERT INTO Team (TeamName, TeamLeader, Credits) VALUES (?, ?, ?,?);";
+
+
+
+        PreparedStatement addShopHistoryItem = connection.prepareStatement(INSERT_SHOPHISTORY);
+
+
+        addShopHistoryItem.setString(1, Asset);
+        addShopHistoryItem.setString(2, BuyTeam);
+        addShopHistoryItem.setString(3, SellTeam);
+        addShopHistoryItem.setString(4, Price);
+        addShopHistoryItem.execute();
+    }
+    public static void removeItemFromShop(Connection connectionOrSell, int index) throws SQLException{
 
        PreparedStatement statement = connection.prepareStatement("DELETE FROM Shop WHERE idx = ? ;");
        statement.setInt(1,index);
@@ -411,7 +547,7 @@ public class DBConnect{
 
         for (int i = 0; i < 5; i++) {
             resultSet.next();
-            Name = resultSet.getString(2);
+            Name = resultSet.getString(4);
             System.out.println("Check login Name " + Name);
             System.out.println("recived Name " + UserName);
 
@@ -430,7 +566,22 @@ public class DBConnect{
         return login;
 
     }
+    public static boolean userExists(Connection connection, String UserName) throws SQLException {
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from Users;");
+        String Name;
+        boolean isIn = false;
+        for (int i = 0; i < 4; i++) {
+            resultSet.next();
+            Name = resultSet.getString(4);
+            if (Name.equals(UserName)){
+                isIn = true;
+                return isIn;
+            }
+        }
 
+        return isIn;
+    }
 
 }
 

@@ -31,10 +31,19 @@ public class ClientGUI {
     private static String teamop;
     private static JButton submitNewSale;
     private static JButton newSale;
-
     private static JButton ViewTeamsItems;
+    private static String userName;
+    private static String Team;
+    private static int credits;
 
-    public static void showClientGUI( ) throws SQLException {
+    public static void showClientGUI(String UName) throws SQLException {
+
+        connection = DBConnect.getInstance();
+        userName = UName;
+        credits = DBConnect.getCredits(connection, UName);
+        String Te = DBConnect.getTeam(connection, UName);
+        Team = Te;
+
 
         //set up window
         JFrame frame = new JFrame("my GUI");
@@ -89,9 +98,9 @@ public class ClientGUI {
 
         newSale.setPreferredSize(dimension);
 
-        topPanel(intePanel);
+        topPanel(intePanel, userName);
 
-        connection = DBConnect.getInstance();
+//        connection = DBConnect.getInstance();
 
         //int i = 1;
         //while (i == 1){
@@ -343,8 +352,10 @@ public class ClientGUI {
     };
 
     public static void main(String[] args) throws SQLException {
-        ClientGUI test = new ClientGUI();
-        test.showClientGUI();
+        String userName = "bob_smith";
+
+        ClientGUI ClientShop = new ClientGUI();
+        ClientShop.showClientGUI(userName);
 
         //ClientGUI test = new ClientGUI();
         //test.addUserGUI();
@@ -516,14 +527,14 @@ public class ClientGUI {
         return menBar;
     }
 
-    public static void topPanel(JPanel intePanel){
+    public static void topPanel(JPanel intePanel, String UserName){
+
 
         JPanel topPanel = new JPanel(new GridLayout(1, 6));
-        JLabel teamName = new JLabel("Team name");
-        JLabel userName = new JLabel("User name         ");
+        JLabel teamName = new JLabel("Team name: " + Team);
+        JLabel userName = new JLabel("User name: " + UserName);
         JLabel search_label = new JLabel("         ");
-
-        JLabel credit = new JLabel("Team credits: C 255 ");
+        JLabel credit = new JLabel("Team credits: C " + credits);
         JTextField search = new JTextField( );
         JButton searchButton = new JButton("Search");
 
@@ -542,9 +553,9 @@ public class ClientGUI {
         topPanel.add(teamName);
         topPanel.add(userName);
 
-        topPanel.add(searchButton);
-        topPanel.add(search);
-        topPanel.add(search_label);
+        //topPanel.add(searchButton);
+        //topPanel.add(search);
+        //topPanel.add(search_label);
         topPanel.add(credit);
 
     }
