@@ -393,13 +393,44 @@ public class DBConnect{
         addUser.execute();
 
     }
-
     static void removeItemFromShop(Connection connectionOrSell, int index) throws SQLException{
 
        PreparedStatement statement = connection.prepareStatement("DELETE FROM Shop WHERE idx = ? ;");
        statement.setInt(1,index);
        statement.executeUpdate();
     }
+    public static int UserLogin(Connection connection, String UserName, String Password ) throws SQLException {
+
+        int login = 0;
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from Users;");
+
+        String Name;
+        String pass;
+        System.out.println("Check login credentuals");
+
+        for (int i = 0; i < 5; i++) {
+            resultSet.next();
+            Name = resultSet.getString(2);
+            System.out.println("Check login Name " + Name);
+            System.out.println("recived Name " + UserName);
+
+            if (Name.equals(UserName)){
+                pass = resultSet.getString(5);
+                System.out.println("Check login password " + pass);
+                if (pass.equals(Password)){
+                    login = 1;
+                    return login;
+                }
+            }else{
+                login = 0;
+            }
+        }
+
+        return login;
+
+    }
+
 
 }
 

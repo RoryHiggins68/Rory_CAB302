@@ -29,9 +29,9 @@ public class ClientGUI {
     private static JComboBox TeamOption;
     private static String buyorsell;
     private static String teamop;
-
     private static JButton submitNewSale;
     private static JButton newSale;
+
     private static JButton ViewTeamsItems;
 
     public static void showClientGUI( ) throws SQLException {
@@ -81,9 +81,6 @@ public class ClientGUI {
         buttonPanel.add(newSale);
         buttonPanel.add(ViewTeamsItems);
         buttonPanel.add(PurchaseHistory);
-        //buttonPanel.add(filterItems);
-        //buttonPanel.add(resetItems);
-        //buttonPanel.add(Details);
         buttonPanel.add(newUserbutton);
 
         newUserbutton.addActionListener(new ButtonListener());
@@ -384,9 +381,6 @@ public class ClientGUI {
     
     private static class ButtonListener implements ActionListener {
 
-        /**
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-         */
         public void addUSer(ActionEvent e) throws SQLException {
             JButton source = (JButton) e.getSource();
             if (source == submit) {
