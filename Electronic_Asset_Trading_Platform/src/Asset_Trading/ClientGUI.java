@@ -8,6 +8,8 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.sql.SQLException;
 
+import static Asset_Trading.DBConnect.getCredits;
+
 //import static jdk.internal.net.http.HttpResponseImpl.RawChannelProvider.connection;
 
 public class ClientGUI {
@@ -38,10 +40,10 @@ public class ClientGUI {
 
         connection = DBConnect.getInstance();
         userName = UName;
-        credits = DBConnect.getCredits(connection, UName);
         String Te = DBConnect.getTeam(connection, UName);
         Team = Te;
 
+        credits = getCredits(connection, Team);
 
         //set up window
         JFrame frame = new JFrame("my GUI");
@@ -113,7 +115,7 @@ public class ClientGUI {
 
     public static void refreshShop(Connection connection,JPanel intePanel) throws SQLException {
 
-        int num = DBConnect.numRows(connection);
+        int num = DBConnect.numShopRows(connection);
         JPanel shopPanel = new JPanel(new GridLayout(num, 1));
         JScrollPane shopPanel2 = new JScrollPane(shopPanel);
         intePanel.add((shopPanel2), BorderLayout.CENTER);
@@ -304,7 +306,7 @@ public class ClientGUI {
         //frame.add(teamitempanel);
 
 
-        int num = DBConnect.numRows(connection);
+        int num = DBConnect.numShopRows(connection);
         JPanel teamsitems = new JPanel(new GridLayout(num, 1));
         JScrollPane teamsitemsscroll = new JScrollPane(teamsitems);
 
@@ -359,7 +361,7 @@ public class ClientGUI {
         //frame.add(teamitempanel);
 
 
-        int num = DBConnect.numRows(connection);
+        int num = DBConnect.numShopRows(connection);
         num = 4;
         JPanel teamsitems = new JPanel(new GridLayout(num, 1));
         JScrollPane teamsitemsscroll = new JScrollPane(teamsitems);
@@ -542,6 +544,7 @@ public class ClientGUI {
                 String tea = teamop;
                 String assname = assetName.getText();
                 String assetprice = Price.getText();
+                String ammount = "10";
 
                 if(assname.length() < 3 || assetprice.length() < 2 ) {
                     JOptionPane.showMessageDialog(null, "Please check the values entered something has been left blank");
@@ -551,7 +554,7 @@ public class ClientGUI {
                     System.out.println("new sale created " + assname + " " + bors + " " + tea + " " + assetprice);
                     JOptionPane.showMessageDialog(null, "The "+tea+" team is looking to "+bors+" "+assname+" for C" + assetprice);
                     connection = DBConnect.getInstance();
-                    DBConnect.addItemToShop(connection,assname,tea,bors,assetprice);
+                    DBConnect.addItemToShop(connection,assname,tea,bors,assetprice,ammount);
                     assetName.setText(" ");
                     Price.setText(" ");
                     BuyorSell.setSelectedIndex(1);
@@ -596,16 +599,22 @@ public class ClientGUI {
         return menBar;
     }
 
-    public static void topPanel(JPanel intePanel, String UserName){
+    public static void topPanel(JPanel intePanel, String UserName) throws SQLException {
 
 
-        JPanel topPanel = new JPanel(new GridLayout(1, 6));
+        JPanel topPanel = new JPanel(new GridLayout(1, 7));
         JLabel teamName = new JLabel("Team name: " + Team);
         JLabel userName = new JLabel("User name: " + UserName);
         JLabel search_label = new JLabel("         ");
         JLabel credit = new JLabel("Team credits: C " + credits);
         JTextField search = new JTextField( );
         JButton searchButton = new JButton("Search");
+        String accType = "User";
+        if (DBConnect.isTeamLeader(connection ,UserName)) {
+            accType = "Team leader ";
+        }
+
+        JLabel UserType = new JLabel("User account: " + accType);
 
         Dimension labelDimension = new Dimension(750, 35);
         topPanel.setPreferredSize(labelDimension);
@@ -615,12 +624,14 @@ public class ClientGUI {
         searchButton.setPreferredSize(searchDim);
         search.setPreferredSize(searchDim);
 
+
         intePanel.add((topPanel), BorderLayout.NORTH);
         Border blackline = BorderFactory.createLineBorder(Color.black);
         topPanel.setBorder(blackline);
 
         topPanel.add(teamName);
         topPanel.add(userName);
+        topPanel.add(UserType);
 
         //topPanel.add(searchButton);
         //topPanel.add(search);
