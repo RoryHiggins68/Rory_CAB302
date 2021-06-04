@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import static Asset_Trading.DBConnect.getCredits;
 
@@ -20,8 +21,10 @@ public class ClientGUI {
     private static JTextField username;
     private static JTextField team;
     private static JTextField assetName;
+    private static JTextField quantity;
     private static JTextField BuySell;
     private static JTextField Price;
+    private static JComboBox selectAsset;
     private static JComboBox BuyorSell;
     private static JComboBox TeamOption;
     private static JButton newUserbutton;
@@ -30,10 +33,13 @@ public class ClientGUI {
     private static JButton newSale;
     private static JButton ViewTeamsItems;
     private static JButton PurchaseHistory;
+    private static JButton RefreshButton;
     private static String buyorsell;
     private static String teamop;
+    private static String assetop;
     private static String userName;
     private static String Team;
+    private static JPanel intePanel;
     private static int credits;
 
     public static void showClientGUI(String UName) throws SQLException {
@@ -48,14 +54,13 @@ public class ClientGUI {
         //set up window
         JFrame frame = new JFrame("my GUI");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        JLabel label = new JLabel("hello world");
         frame.setPreferredSize(new Dimension(750, 750));
 
         JMenuBar menBar = menuBar();
         frame.setJMenuBar(menBar);
 
         //set up panel
-        JPanel intePanel = new JPanel();
+        intePanel = new JPanel();
         frame.getContentPane().add(intePanel);
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
@@ -67,6 +72,7 @@ public class ClientGUI {
         JPanel buttonPanel = new JPanel(new GridLayout(10, 1));
         intePanel.add(buttonPanel, BorderLayout.EAST);
 
+        RefreshButton = new JButton("Refresh the store");
         newSale = new JButton("Post new sale");
         ViewTeamsItems = new JButton("View teams items");
         PurchaseHistory = new JButton("Purchase History");
@@ -78,6 +84,7 @@ public class ClientGUI {
         //newUserbutton.addActionListener(new ButtonListener());
 
         Dimension dimension = new Dimension(150, 20);
+        RefreshButton.setPreferredSize(dimension);
         newSale.setPreferredSize(dimension);
         ViewTeamsItems.setPreferredSize(dimension);
         PurchaseHistory.setPreferredSize(dimension);
@@ -86,12 +93,13 @@ public class ClientGUI {
         Details.setPreferredSize(dimension);
         newUserbutton.setPreferredSize(dimension);
 
-
+        buttonPanel.add(RefreshButton);
         buttonPanel.add(newSale);
         buttonPanel.add(ViewTeamsItems);
         buttonPanel.add(PurchaseHistory);
         buttonPanel.add(newUserbutton);
 
+        RefreshButton.addActionListener(new ButtonListener());
         newUserbutton.addActionListener(new ButtonListener());
         newSale.addActionListener(new ButtonListener());
         ViewTeamsItems.addActionListener(new ButtonListener());
@@ -222,17 +230,17 @@ public class ClientGUI {
 
     }
 
-    public static void addNewSaleGUI( ) {
+    public static void addNewSaleGUI( ) throws SQLException {
         JFrame frame = new JFrame("my GUI");
         //frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 
-        JPanel addAssetPanel = new JPanel(new GridLayout(6, 1));
-        Dimension addassetDim = new Dimension(400, 250);
+        JPanel addAssetPanel = new JPanel(new GridLayout(7, 1));
+        Dimension addassetDim = new Dimension(400, 350);
         addAssetPanel.setPreferredSize(addassetDim);
         frame.add(addAssetPanel);
 
-        String text = ("Please enter the name Name the price what team is offering and " +
+        String text = ("Please select a Asset and enter the price and " +
                 "whether you are buying or selling.");
 
 
@@ -252,22 +260,46 @@ public class ClientGUI {
         JLabel BuySellLabel = new JLabel("Select buying or selling:   ");
         JLabel theTeamLabel = new JLabel("The team making the offer:   ");
         JLabel priceLabel = new JLabel("Enter the price:   ");
+        JLabel quantityLabel = new JLabel("Enter the quantity:   ");
 
         JPanel assetDetailsPanel = new JPanel();
+        JPanel quantityPanel = new JPanel();
         JPanel assetNamePanel = new JPanel();
         JPanel BuySellPanel = new JPanel();
         JPanel TeamPanel = new JPanel();
         JPanel pricePanel = new JPanel();
         JPanel buttonPanel = new JPanel();
 
-        assetName = new JTextField(" ",20);
+
+        int numTeam = DBConnect.getNumTeams(connection);
+        String teams[] = new String[numTeam];
+
+        for(int i = 1; i <= numTeam; i++){
+            teams[i-1] = DBConnect.getNthTeam(connection, i);
+
+        }
+
+        int numassets = DBConnect.getNumAssets(connection);
+        String teamsAss[] = new String[numassets + 1];
+        teamsAss[0] = " ";
+        for(int i = 1; i <= numassets; i++){
+            teamsAss[i] = DBConnect.getnthAssetfromAssetsTable(connection, i);
+        }
+
+        String team[] = new String[2];
+        team[0] = " ";
+        team[1] = Team;
+
+        quantity = new JTextField("1",20);
+        selectAsset = new JComboBox(teamsAss);
+        //assetName = new JTextField("1",20);
         String option[]= {" ", "BUY","SELL"};
         BuyorSell = new JComboBox(option);
-        String teamoption[]= {" ", "A","B","C","D","E"};
-        TeamOption = new JComboBox(teamoption);
-        Price = new JTextField(" ",20);
+        TeamOption = new JComboBox(team);
+        Price = new JTextField("1",20);
         submitNewSale = new JButton("Submit");
 
+        addAssetPanel.add(quantityPanel);
         addAssetPanel.add(assetDetailsPanel);
         addAssetPanel.add(assetNamePanel);
         addAssetPanel.add(BuySellPanel);
@@ -278,16 +310,19 @@ public class ClientGUI {
 
         assetDetailsPanel.add(textArea,BorderLayout.CENTER);
         assetNamePanel.add(EnterAssetLabel,BorderLayout.EAST);
-        assetNamePanel.add(assetName,BorderLayout.WEST);
+        assetNamePanel.add(selectAsset,BorderLayout.WEST);
         BuySellPanel.add(BuySellLabel,BorderLayout.EAST);
         BuySellPanel.add(BuyorSell,BorderLayout.WEST);
         TeamPanel.add(theTeamLabel,BorderLayout.EAST);
         TeamPanel.add(TeamOption,BorderLayout.WEST);
+        pricePanel.add(quantityLabel,BorderLayout.EAST);
+        pricePanel.add(quantity,BorderLayout.WEST);
         pricePanel.add(priceLabel,BorderLayout.EAST);
         pricePanel.add(Price,BorderLayout.WEST);
         buttonPanel.add(submitNewSale,BorderLayout.CENTER);
 
         submitNewSale.addActionListener(new ButtonListener());
+        selectAsset.addActionListener(new ComboListener());
         BuyorSell.addActionListener(new ComboListener());
         TeamOption.addActionListener(new ComboListener());
 
@@ -442,6 +477,11 @@ public class ClientGUI {
                 teamop = (String)cb.getSelectedItem();
                 System.out.println("its 2 " + teamop);
 
+            }else if(cb == selectAsset){
+
+                assetop = (String)cb.getSelectedItem();
+                System.out.println("its 2 " + teamop);
+
             }
 
         }
@@ -469,7 +509,11 @@ public class ClientGUI {
             }else if (source == newUserbutton) {
                 launchnewUserGUI();
             }else if (source == newSale){
-                launchnewSaleGUI();
+                try {
+                    launchnewSaleGUI();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }else if (source == submitNewSale){
                 try {
                     newSale();
@@ -488,6 +532,13 @@ public class ClientGUI {
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
+            }else if(source == RefreshButton ){
+                System.out.println("refreshed");
+                try {
+                    refreshShop( connection, intePanel);
+                } catch (SQLException throwables) {
+
+                }
             }
 
         }
@@ -495,8 +546,6 @@ public class ClientGUI {
         private void showteamPurchaseHistory() throws SQLException {
             ClientGUI PurchaseHistory = new ClientGUI();
             PurchaseHistory.SaleHistory();
-
-
         }
 
         private void showteamitems() throws SQLException {
@@ -511,7 +560,7 @@ public class ClientGUI {
 
         }
 
-        private void launchnewSaleGUI() {
+        private void launchnewSaleGUI() throws SQLException {
             ClientGUI test = new ClientGUI();
             test.addNewSaleGUI();
 
@@ -538,18 +587,26 @@ public class ClientGUI {
         }
 
         private void newSale() throws SQLException {
-            if (assetName.getText() != null ){
+            if (assetop != null ) {
 
                 String bors = buyorsell;
                 String tea = teamop;
-                String assname = assetName.getText();
+                String assname = assetop;
                 String assetprice = Price.getText();
-                String ammount = "10";
+                String ammount = quantity.getText();
 
-                if(assname.length() < 3 || assetprice.length() < 2 ) {
+                int howmany = Integer.parseInt(ammount);
+
+                if(assname == null){
+                    JOptionPane.showMessageDialog(null, "Please check the values entered something has been left blank");
+                }else if(assname.length() < 3 || assetprice.length() < 1 ) {
                     JOptionPane.showMessageDialog(null, "Please check the values entered something has been left blank");
                 }else if(assname == null || bors == null || tea == null || assetprice == null){
                     JOptionPane.showMessageDialog(null, "Please check the values entered something has been left null");
+                }else if(( buyorsell.equals("SELL"))&&!(DBConnect.TeamHasAsset(connection,teamop,assetop))){
+                    JOptionPane.showMessageDialog(null, "You do not have " + assname +" to sell");
+                }else if(( buyorsell.equals("SELL"))&&!(DBConnect.getNumofATeamAsset(connection, teamop, assname, howmany))){
+                    JOptionPane.showMessageDialog(null, "You do not have enough " + assname +" to sell, try again");
                 }else{
                     System.out.println("new sale created " + assname + " " + bors + " " + tea + " " + assetprice);
                     JOptionPane.showMessageDialog(null, "The "+tea+" team is looking to "+bors+" "+assname+" for C" + assetprice);
@@ -561,8 +618,6 @@ public class ClientGUI {
                     TeamOption.setSelectedIndex(1);
 
                 }
-
-
 
             }
         }

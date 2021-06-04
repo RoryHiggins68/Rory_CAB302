@@ -44,8 +44,8 @@ public class Marketplace {
                 Asset2 = DBConnect.getNthAsset(connection,i+1 );
                 BuyOrSell1 = DBConnect.getNthBuyOrSell(connection,i);
                 BuyOrSell2 = DBConnect.getNthBuyOrSell(connection,i+1);
-                Team1 = DBConnect.getNthTeam(connection,i);
-                Team2 = DBConnect.getNthTeam(connection,i+1);
+                Team1 = DBConnect.getNthShopTeam(connection,i);
+                Team2 = DBConnect.getNthShopTeam(connection,i+1);
                 BuyTeam = Team1;
                 SellTeam = Team2;
                 idx = Integer.parseInt(DBConnect.getShopidx(connection,i));
@@ -99,6 +99,8 @@ public class Marketplace {
 
                                     DBConnect.deductItemsFromShop(connection, buyidx, sellidx, amountToBeSold);
                                     //needs to moved to sales history
+                                    DBConnect.addAssetToTeam(connection,BuyTeam, Asset1, amountToBeSold);
+                                    DBConnect.addAssetToTeam(connection,SellTeam, Asset1, -amountToBeSold);
                                     DBConnect.addShopHistoryItem(connection,Asset1, BuyTeam, SellTeam, Price1);
                                     num = DBConnect.numShopRows(connection);
                                     i = 0;
@@ -115,6 +117,9 @@ public class Marketplace {
                                 if(subCredits(connection, BuyTeam,SellTeam, p1,amountToBeSold)>0){;
                                     System.out.println(Asset1 + " is being sold for p2 price of " + p2 );
                                     DBConnect.deductItemsFromShop(connection, buyidx, sellidx, amountToBeSold);
+                                    DBConnect.addAssetToTeam(connection,BuyTeam, Asset1, amountToBeSold);
+                                    DBConnect.addAssetToTeam(connection,SellTeam, Asset1, -amountToBeSold);
+
                                     //needs to moved to sales history
                                     DBConnect.addShopHistoryItem(connection,Asset1, BuyTeam, SellTeam, Price2);
                                     num = DBConnect.numShopRows(connection);
@@ -134,6 +139,10 @@ public class Marketplace {
                             if(subCredits(connection, BuyTeam,SellTeam, p1,amountToBeSold)>0) {
                                 System.out.println(Asset1 + " is being sold, p1 and p2 are the same  price of " + p1);
                                 DBConnect.deductItemsFromShop(connection, buyidx, sellidx, amountToBeSold);
+                                DBConnect.addAssetToTeam(connection,BuyTeam, Asset1, amountToBeSold);
+                                DBConnect.addAssetToTeam(connection,SellTeam, Asset1, -amountToBeSold);
+
+
                                 //needs to moved to sales history
                                 DBConnect.addShopHistoryItem(connection, Asset1, BuyTeam, SellTeam, Price1);
                                 num = DBConnect.numShopRows(connection);

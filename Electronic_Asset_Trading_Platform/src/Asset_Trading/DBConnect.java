@@ -72,6 +72,7 @@ public class DBConnect{
         }
 
         if(num < 7){
+            AddUserandTeams(connection);
             PopulateDatabase(connection);
         }
 
@@ -81,6 +82,8 @@ public class DBConnect{
         }else{
             System.out.println("the number of rows is " + num + " database has been populated");
         }
+
+
 
     }
     public static Connection getInstance() throws SQLException {
@@ -117,7 +120,7 @@ public class DBConnect{
         System.out.println("The "+Team+" team is looking to "+BuyOrSell+" "+Asset+" for C" + Price);
 
     }
-    public static void PopulateDatabase(Connection connection) throws SQLException{
+    public static void AddUserandTeams(Connection connection) throws SQLException{
 
 
         String firstName = "bob";
@@ -161,155 +164,6 @@ public class DBConnect{
         addUser(connection, firstName,lastName,Username,Password,Team);
 
 
-        String AssetName = "CPU time";
-        String HighPrice = "40";
-        String LowPrice = "20";
-        String Description = "CPU time on one of the servers to used for what ever the user needs";
-
-        addAsset(connection, AssetName,HighPrice,LowPrice,Description);
-
-
-        AssetName = "Printing x 10";
-        HighPrice = "5";
-        LowPrice = "1";
-        Description = "Printing services";
-
-        addAsset(connection, AssetName,HighPrice,LowPrice,Description);
-
-        String Asset = "Printing";
-        String TeamRequest = "A";
-        String BuyOrSell = "Buy";
-        String Price = "2";
-        String Amount = "25";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-
-        Asset = "Printing";
-        TeamRequest = "B";
-        BuyOrSell = "Sell";
-        Price = "2";
-        Amount = "2000";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-
-        Asset = "CPU Time";
-        TeamRequest = "A";
-        BuyOrSell = "Buy";
-        Price = "10";
-        Amount = "75";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price,Amount);
-
-        Asset = "CPU Time";
-        TeamRequest = "C";
-        BuyOrSell = "Sell";
-        Price = "12";
-        Amount = "100";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-        Asset = "CPU Time";
-        TeamRequest = "C";
-        BuyOrSell = "Buy";
-        Price = "120";
-        Amount = "12";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-        Asset = "Computer";
-        TeamRequest = "C";
-        BuyOrSell = "Buy";
-        Price = "1000";
-        Amount = "1";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-        Asset = "Computer";
-        TeamRequest = "D";
-        BuyOrSell = "Sell";
-        Price = "1000";
-        Amount = "1";
-
-        //addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price);
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-        Asset = "Lazering";
-        TeamRequest = "A";
-        BuyOrSell = "Sell";
-        Price = "100000";
-        Amount = "2";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-
-        Asset = "Lazering";
-        TeamRequest = "G";
-        BuyOrSell = "Buy";
-        Price = "10";
-        Amount = "2";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-
-        Asset = "Proof reading";
-        TeamRequest = "C";
-        BuyOrSell = "Buy";
-        Price = "3";
-        Amount = "10";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-
-        Asset = "Proof reading";
-        TeamRequest = "A";
-        BuyOrSell = "Sell";
-        Price = "3";
-        Amount = "20";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-
-        Asset = "IT services";
-        TeamRequest = "A";
-        BuyOrSell = "Sell";
-        Price = "150";
-        Amount = "60";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-
-        Asset = "IT services";
-        TeamRequest = "B";
-        BuyOrSell = "Buy";
-        Price = "140";
-        Amount = "60";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-
-        Asset = "A New car";
-        TeamRequest = "B";
-        BuyOrSell = "Buy";
-        Price = "100000";
-        Amount = "1";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-
-        Asset = "A New car";
-        TeamRequest = "A";
-        BuyOrSell = "Sell";
-        Price = "100000";
-        Amount = "1";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-        Asset = "Somthing";
-        TeamRequest = "A";
-        BuyOrSell = "Sell";
-        Price = "105";
-        Amount = "4";
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
-        Asset = "Somthing";
-        TeamRequest = "A";
-        BuyOrSell = "Buy";
-        Price = "105";
-        Amount = "5";
-
-
-        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price,Amount);
-
-
         Team = "great";
         String TeamLeader = "bob_sm";
         String Credits = "2000";
@@ -346,6 +200,215 @@ public class DBConnect{
 
         addTeam(connection, Team, TeamLeader,Credits );
 
+        createTeamsDatabase(connection);
+
+
+    }
+    public static void PopulateDatabase(Connection connection) throws SQLException{
+
+        String AssetName = "CPU Time";
+        String HighPrice = "0";
+        String LowPrice = "0";
+        String Description = "CPU time on one of the servers to used for what ever the user needs";
+
+        addAsset(connection, AssetName,HighPrice,LowPrice,Description);
+
+        AssetName = "Printing";
+        HighPrice = "0";
+        LowPrice = "0";
+        Description = " Printing";
+
+        addAsset(connection, AssetName,HighPrice,LowPrice,Description);
+
+
+        AssetName = "Computer";
+        HighPrice = "0";
+        LowPrice = "0";
+        Description = "Computer";
+
+        addAsset(connection, AssetName,HighPrice,LowPrice,Description);
+
+        AssetName = "IT services";
+        HighPrice = "0";
+        LowPrice = "0";
+        Description = "It services";
+
+        addAsset(connection, AssetName,HighPrice,LowPrice,Description);
+
+        AssetName = "A New car";
+        HighPrice = "0";
+        LowPrice = "0";
+        Description = "Car ";
+
+        addAsset(connection, AssetName,HighPrice,LowPrice,Description);
+
+        AssetName = "Somthing";
+        HighPrice = "0";
+        LowPrice = "0";
+        Description = "Somthing, Somthing ,Somthing";
+
+        addAsset(connection, AssetName,HighPrice,LowPrice,Description);
+
+        AssetName = "Test Asset";
+        HighPrice = "0";
+        LowPrice = "0";
+        Description = "Testing";
+
+        addAsset(connection, AssetName,HighPrice,LowPrice,Description);
+
+
+
+        String Asset = "Printing";
+        String TeamRequest = "A";
+        String BuyOrSell = "Buy";
+        String Price = "2";
+        String Amount = "25";
+
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "Printing";
+        TeamRequest = "B";
+        BuyOrSell = "Sell";
+        Price = "2";
+        Amount = "2000";
+        addAssetToTeam(connection,"B", "Printing", 2000);
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "CPU Time";
+        TeamRequest = "A";
+        BuyOrSell = "Buy";
+        Price = "10";
+        Amount = "75";
+
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price,Amount);
+
+        Asset = "CPU Time";
+        TeamRequest = "C";
+        BuyOrSell = "Sell";
+        Price = "12";
+        Amount = "100";
+        addAssetToTeam(connection,"C", "CPU Time", 110);
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "CPU Time";
+        TeamRequest = "C";
+        BuyOrSell = "Buy";
+        Price = "120";
+        Amount = "12";
+
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "Computer";
+        TeamRequest = "C";
+        BuyOrSell = "Buy";
+        Price = "1000";
+        Amount = "1";
+
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "Computer";
+        TeamRequest = "D";
+        BuyOrSell = "Sell";
+        Price = "1000";
+        Amount = "1";
+
+        //addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price);
+        addAssetToTeam(connection,"D", "Computer", 1);
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "Lazering";
+        TeamRequest = "A";
+        BuyOrSell = "Sell";
+        Price = "100000";
+        Amount = "2";
+        addAssetToTeam(connection,"A", "Lazering", 2);
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "Lazering";
+        TeamRequest = "C";
+        BuyOrSell = "Buy";
+        Price = "10";
+        Amount = "2";
+
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "Proof reading";
+        TeamRequest = "C";
+        BuyOrSell = "Buy";
+        Price = "3";
+        Amount = "10";
+
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "Proof reading";
+        TeamRequest = "A";
+        BuyOrSell = "Sell";
+        Price = "3";
+        Amount = "20";
+
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+        addAssetToTeam(connection,"A", "Proof reading", 30);
+
+        Asset = "IT services";
+        TeamRequest = "A";
+        BuyOrSell = "Sell";
+        Price = "150";
+        Amount = "60";
+
+        addAssetToTeam(connection,"A", "IT services", 100);
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "IT services";
+        TeamRequest = "B";
+        BuyOrSell = "Buy";
+        Price = "140";
+        Amount = "60";
+
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "A New car";
+        TeamRequest = "B";
+        BuyOrSell = "Buy";
+        Price = "100000";
+        Amount = "1";
+
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "A New car";
+        TeamRequest = "A";
+        BuyOrSell = "Sell";
+        Price = "100000";
+        Amount = "1";
+
+        addAssetToTeam(connection,"A", "A New car", 1);
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "Somthing";
+        TeamRequest = "A";
+        BuyOrSell = "Sell";
+        Price = "105";
+        Amount = "4";
+        addAssetToTeam(connection,"A", "Somthing", 4);
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price, Amount);
+
+        Asset = "Somthing";
+        TeamRequest = "A";
+        BuyOrSell = "Buy";
+        Price = "105";
+        Amount = "5";
+
+
+        addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price,Amount);
+
+
+/*
+        addAssetToTeam(connection,"A", "Computer", 50);
+        addAssetToTeam(connection,"C", "Computer", 4);
+        addAssetToTeam(connection,"B", "Printing", 10);
+        addAssetToTeam(connection,"A", "CPU Time", 5);*/
+
+
+
     }
     public static void createDatabase(Connection connection) throws SQLException {
 
@@ -355,7 +418,9 @@ public class DBConnect{
         st.execute(CREATE_SHOP_TABLE);
         st.execute(CREATE_TEAM_TABLE);
         st.execute(CREATE_SHOP_HISTORY_TABLE);
-        createTeams(connection);
+        createTeamsDatabase(connection);
+
+
 
     }
     public static void addAsset(Connection connection,String AssetName, String HighPrice, String LowPrice, String Description) throws SQLException {
@@ -536,7 +601,7 @@ public class DBConnect{
             }
         }
     }
-    public static void createTeams(Connection connection) throws SQLException {
+    public static void createTeamsDatabase(Connection connection) throws SQLException {
 
         int numteams = getNumTeams(connection);
 
@@ -549,18 +614,60 @@ public class DBConnect{
             PreparedStatement statement1 = connection.prepareStatement("CREATE TABLE IF NOT EXISTS TEAM_" + teamName + "_Assets ("
                     + "idx INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */ NOT NULL UNIQUE," // from https://stackoverflow.com/a/41028314
                     + "Asset VARCHAR(15),"
-                    + "BuyTeam VARCHAR(15),"
-                    + "SellTeam VARCHAR(15),"
-                    + "Price VARIANT(15)" + ");");
+                    + "Amount  VARIANT(15)" + ");");
 
             statement1.executeUpdate();
 
         }
 
     }
-    public static void addAssetToTeam(Connection connection,String team, String asset, int ammount){
+    public static void addAssetToTeam(Connection connection,String team, String asset, int amount) throws SQLException {
 
-    //Adds assets to the teams database
+        PreparedStatement addAsset = null;
+        //Adds assets to the teams database
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from TEAM_" + team + "_Assets;");
+        int num = getNumTeamAssets(connection, team);
+        int match = 0;
+        if(resultSet.isClosed()) {
+
+            String INSERT_TEAMASSET = "INSERT INTO TEAM_" + team + "_Assets (Asset, Amount) VALUES (?, ?);";
+            addAsset = connection.prepareStatement(INSERT_TEAMASSET);
+            addAsset.setString(1, asset);
+            addAsset.setString(2, String.valueOf(amount));
+
+        }else{
+            for (int i = 0; i < num; i++) {
+                resultSet.next();
+                if(resultSet.getString(2).equals(asset)){
+                    int total = amount + Integer.parseInt( resultSet.getString(3));
+
+                    //System.out.println("total is " + total);
+
+                    addAsset = connection.prepareStatement("UPDATE TEAM_" + team + "_Assets SET Amount = ? WHERE Asset = ? ;");
+
+                    addAsset.setString(1, String.valueOf(total));
+                    addAsset.setString(2, asset);
+                    match = 1;
+                    i = num+1;
+                    System.out.println("String is:  " + addAsset);
+
+                }
+            }
+
+        }
+        if(match == 0){
+
+            String INSERT_TEAMASSET = "INSERT INTO TEAM_" + team + "_Assets (Asset, Amount) VALUES (?, ?);";
+            addAsset = connection.prepareStatement(INSERT_TEAMASSET);
+            addAsset.setString(1, asset);
+            addAsset.setString(2, String.valueOf(amount));
+
+        }
+        //System.out.println("String is:  " + addAsset);
+        addAsset.execute();
+
+
 
     }
 
@@ -614,7 +721,18 @@ public class DBConnect{
         String Asset = resultSet.getString(2);
         return Asset;
     }
+    public static String getNthShopTeam(Connection connection, int Nth ) throws SQLException{
+
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from Shop;");
+
+
+        for (int i = 0; i < Nth; i++) {resultSet.next();}
+        String Team = resultSet.getString(3);
+        return Team;
+    }
     public static String getNthTeam(Connection connection, int Nth ) throws SQLException{
+
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from Team;");
         int numTeams = getNumTeams(connection);
@@ -717,7 +835,77 @@ public class DBConnect{
         String Price = resultSet.getString(5);
         return Price;
     }
+    public static String getnthAssetfromAssetsTable(Connection connection, int Nth ) throws SQLException{
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from Assets;");
 
+        //resultSet.next();
+        if(resultSet.isClosed())
+            System.out.println("ThE RESULT WAS CLOSED, might be empty");
+
+        for (int i = 0; i < Nth; i++) {
+            resultSet.next();
+
+        }
+
+
+        String Asset = resultSet.getString(2);
+        return Asset;
+    }
+
+    public static boolean getNumofATeamAsset(Connection connection, String team, String asset, int howmany) throws SQLException {
+
+        int num = 0;
+
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from TEAM_" + team + "_Assets;");
+
+        int numAssets = getNumTeamAssets(connection ,team);
+        int amount = 0;
+        boolean result = false ;
+
+        for(int i = 0; i < numAssets; i++){
+            resultSet.next();
+            String entry = resultSet.getString(2);
+            if(asset.equals(entry)){
+                amount = Integer.parseInt(resultSet.getString(3));
+                i = numAssets + 1;
+            }
+        }
+        if(amount > howmany){
+            result = true;
+        }
+
+        return result;
+
+    }
+    public static int getNumTeamAssets(Connection connection, String team) throws SQLException {
+
+        int num = 0;
+
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from TEAM_" + team + "_Assets;");
+
+        resultSet.next();
+        int rowNum =  resultSet.getRow();
+
+        if (rowNum == 0){
+            System.out.println("The num is  " + rowNum);
+        }else{
+            int i = 1;
+            while(i==1){
+                resultSet.next();
+                if (resultSet.getRow() > rowNum){
+                    rowNum = resultSet.getRow();
+                }else{
+                    i = 2;
+                }
+            }
+        }
+
+        return rowNum;
+
+    }
     public static int getAmountShop(Connection connection, int index) throws SQLException {
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -947,7 +1135,25 @@ public class DBConnect{
         }
         return isLeader;
     }
-    //function to get number of teams and user and assets and shophistory
+    public static boolean TeamHasAsset(Connection connection, String team, String Asset) throws SQLException {
+
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from TEAM_" + team + "_Assets;");
+        String assetsFromTeam;
+        boolean TeamHas= false;
+        int numAssets = getNumTeamAssets(connection, team);
+
+        for (int i = 0; i < numAssets; i++) {
+            resultSet.next();
+            assetsFromTeam = resultSet.getString(2);
+            if (assetsFromTeam.equals(Asset)){
+                TeamHas = true;
+                return TeamHas;
+            }
+        }
+        return TeamHas;
+    }
+
 
 
 }
