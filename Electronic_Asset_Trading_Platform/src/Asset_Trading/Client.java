@@ -33,12 +33,19 @@ public class Client {
 
     }
 
+
+
+    /**
+     * Displays the user login, this is the first screen the user will from here they can loging to
+     * the system
+     */
     public static void showClientGUI() throws SQLException {
 
         //set up window
         frame = new JFrame("Login");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+        //create the panels
         frame.setPreferredSize(new Dimension(400, 300));
         JLabel instructionlabel = new JLabel("Enter username and password.");
         JLabel labelName = new JLabel("User Name");
@@ -48,12 +55,13 @@ public class Client {
         JPanel LogonPanel2 = new JPanel(new GridLayout(1, 2));
         JPanel LogonPanel3 = new JPanel(new GridLayout(1, 2));
 
-
+        //create the text fields
         frame.getContentPane().add(LogonPanel);
         UserName = new JTextField();
         Password = new JTextField();
         Login = new JButton("Login");
 
+        //add them to the frame
         LogonPanel.add(instructionlabel);
         LogonPanel.add(LogonPanel2);
         LogonPanel2.add(labelName);
@@ -63,31 +71,41 @@ public class Client {
         LogonPanel3.add(Password);
         LogonPanel.add(Login);
 
-
+        // add a listener for the login button
         Login.addActionListener(new Client.BListener());
 
+        //pack the frame
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-
     }
 
+    /**
+     * Displays the user login, this is the first screen the user will from here they can loging to
+     * the system
+     *
+     * @param userName for login will be checked against the users in the database
+     * @param password for login this will be checked against the database entry of the user name
+     */
     public static void Clientrequest(String userName, String password) throws IOException, ClassNotFoundException, SQLException {
 
+        // attempt to connect to the local server on port 12345
         Socket socket = new Socket("127.0.0.1", 12345);
         ServerSocket serverSocket = new ServerSocket();
 
-
+        // send the username and password over the connection to the server
+        //NOTE PASSWORED TO BE HASHED
         OutputStream outputStream = socket.getOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
         objectOutputStream.writeObject(userName);
         objectOutputStream.writeObject(password);
 
-
+        // wait for a reply from the server
         InputStream inputStream = socket.getInputStream();
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
         int login = (int) objectInputStream.readObject();
+        // if login exepted then launch main GUI if login failed let them try again
         if (login == 1){
             JOptionPane.showMessageDialog(null, "Username or password correct, logging in");
             frame.setVisible(false);
@@ -107,6 +125,10 @@ public class Client {
 
     }
 
+    /**
+     * BListener implements ActionListener and will attept to login when user name
+     * and password are entered.
+     */
     private static class BListener implements ActionListener {
 
 

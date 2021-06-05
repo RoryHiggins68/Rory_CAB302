@@ -7,13 +7,21 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import static Asset_Trading.DBConnect.getCredits;
 
 //import static jdk.internal.net.http.HttpResponseImpl.RawChannelProvider.connection;
 
+
+/**
+ * The client GUI contains the verius GUIs that make up the the program, it will be launched after
+ * a successful login and from here the user will be able to do all main operations of the program
+ *
+ * The client GUI will be the main area that the user starts from and were the shop and controls
+ * cne be seen.
+ */
 public class ClientGUI {
+    private static JFrame Mainframe;
     private static Object ButtonListener;
     private static Connection connection;
     private static JTextField firstname;
@@ -40,30 +48,38 @@ public class ClientGUI {
     private static String userName;
     private static String Team;
     private static JPanel intePanel;
+    private static JPanel shopPanel;
     private static int credits;
 
+
+    /**
+     * Sets up the main user interface, from here the user can see the main Shop
+     * area with all post buy sell requests, as well as lunch other GUIs. The teams credits will be
+     * desplayed as well as there acount and privlage level ie (team lead, admin, user)
+     *
+     * @param UName the name of the user that has logged on, this will be used to get their team ect.
+     */
     public static void showClientGUI(String UName) throws SQLException {
 
+        //set up parameters need for the display
         connection = DBConnect.getInstance();
         userName = UName;
         String Te = DBConnect.getTeam(connection, UName);
         Team = Te;
-
         credits = getCredits(connection, Team);
 
         //set up window
-        JFrame frame = new JFrame("my GUI");
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(750, 750));
+        Mainframe = new JFrame("Electronic Asset Trading Platform");
+        Mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        Mainframe.setPreferredSize(new Dimension(750, 750));
 
-        JMenuBar menBar = menuBar();
-        frame.setJMenuBar(menBar);
+        //JMenuBar menBar = menuBar();
+        //Mainframe.setJMenuBar(menBar);
 
-        //set up panel
+        //set up main panel side bar and
         intePanel = new JPanel();
-        frame.getContentPane().add(intePanel);
+        Mainframe.getContentPane().add(intePanel);
         Border blackline = BorderFactory.createLineBorder(Color.black);
-
         BorderLayout layoutMan = new BorderLayout();
         intePanel.setLayout(layoutMan);
         JPanel sideBar = new JPanel();
@@ -72,6 +88,7 @@ public class ClientGUI {
         JPanel buttonPanel = new JPanel(new GridLayout(10, 1));
         intePanel.add(buttonPanel, BorderLayout.EAST);
 
+        //add buttons and set dimention
         RefreshButton = new JButton("Refresh the store");
         newSale = new JButton("Post new sale");
         ViewTeamsItems = new JButton("View teams items");
@@ -80,9 +97,6 @@ public class ClientGUI {
         JButton resetItems = new JButton("Reset Items");
         JButton Details = new JButton("Details");
         newUserbutton = new JButton("Add a new user");
-
-        //newUserbutton.addActionListener(new ButtonListener());
-
         Dimension dimension = new Dimension(150, 20);
         RefreshButton.setPreferredSize(dimension);
         newSale.setPreferredSize(dimension);
@@ -93,12 +107,14 @@ public class ClientGUI {
         Details.setPreferredSize(dimension);
         newUserbutton.setPreferredSize(dimension);
 
+        //add buttons to buttonPanel
         buttonPanel.add(RefreshButton);
         buttonPanel.add(newSale);
         buttonPanel.add(ViewTeamsItems);
         buttonPanel.add(PurchaseHistory);
         buttonPanel.add(newUserbutton);
 
+        // add the Action Listeners for the buttons
         RefreshButton.addActionListener(new ButtonListener());
         newUserbutton.addActionListener(new ButtonListener());
         newSale.addActionListener(new ButtonListener());
@@ -106,25 +122,53 @@ public class ClientGUI {
         PurchaseHistory.addActionListener(new ButtonListener());
 
         newSale.setPreferredSize(dimension);
-
         topPanel(intePanel, userName);
 
-//        connection = DBConnect.getInstance();
+        //deplay all posted shop requests
+        populateshShop( connection, intePanel);
 
-        //int i = 1;
-        //while (i == 1){
-        refreshShop( connection, intePanel);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-       // }
+        //pack fram and display
+        Mainframe.pack();
+        Mainframe.setLocationRelativeTo(null);
+        Mainframe.setVisible(true);
+
 
     }
 
-    public static void refreshShop(Connection connection,JPanel intePanel) throws SQLException {
+    /**
+     *Refreshes the content of the shop
+     * @param connection
+     * @param intePanel
+     */
+    public static void refreshShop(Connection connection, JPanel intePanel) throws SQLException {
+
+        Mainframe.dispose();
+        ClientGUI ClientShop = new ClientGUI();
+        ClientShop.showClientGUI(userName);
+
+
+    }
+
+
+    /**
+     * Quires the database for the content of the shop and then adds all items in to the and displays the
+     * on screen with their prices quantile posting team and whether they are buying or selling the item.
+     *
+     * @param connection is the connection to the database
+     * @param intePanel the pannel were the shop posts will be added
+     *
+     */
+    public static void populateshShop(Connection connection, JPanel intePanel) throws SQLException {
+
+
+        if(shopPanel != null ){
+            intePanel.remove(shopPanel);
+            intePanel.validate();
+            //intePanel.repaint();
+        }
 
         int num = DBConnect.numShopRows(connection);
-        JPanel shopPanel = new JPanel(new GridLayout(num, 1));
+        shopPanel = new JPanel(new GridLayout(num, 1));
         JScrollPane shopPanel2 = new JScrollPane(shopPanel);
         intePanel.add((shopPanel2), BorderLayout.CENTER);
 
@@ -136,10 +180,10 @@ public class ClientGUI {
         for (int i = 0; i < num; i++) {
 
             itempanels[i] = new JPanel();
-            String Asset = DBConnect.getNthAsset(connection,i+1 );
-            String Team = DBConnect.getNthTeam(connection,i+1 );
-            String BuyOrSell = DBConnect.getNthBuyOrSell(connection,i+1);
-            String Price = DBConnect.getNthPrice(connection,i+1);
+            String Asset = DBConnect.getNthAsset(connection,num-i);
+            String Team = DBConnect.getNthShopTeam(connection,num-i);
+            String BuyOrSell = DBConnect.getNthBuyOrSell(connection,num-i);
+            String Price = DBConnect.getNthPrice(connection,num-i);
 
             String alltogether = ("The "+Team+" team is looking to "+BuyOrSell+" "+Asset+" for " + Price +" Credits");
             assetname[i] = new JLabel(alltogether);
@@ -153,8 +197,11 @@ public class ClientGUI {
 
     }
 
+    /**
+     * The GUI that is used to add new users to the user database
+     */
     public static void addUserGUI( ){
-        JFrame frame = new JFrame("my GUI");
+        JFrame frame = new JFrame("New User");
         //frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 
@@ -230,8 +277,11 @@ public class ClientGUI {
 
     }
 
+    /**
+     * The GUI that is used to add new users to the user database
+     */
     public static void addNewSaleGUI( ) throws SQLException {
-        JFrame frame = new JFrame("my GUI");
+        JFrame frame = new JFrame("Post new sale");
         //frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 
@@ -332,6 +382,9 @@ public class ClientGUI {
 
     }
 
+    /**
+     * The GUI that is used to display all items the users team have posted in the store
+     */
     public static void teamitems() throws SQLException {
 
         String team = Team;
@@ -387,6 +440,9 @@ public class ClientGUI {
 
     };
 
+    /**
+     * The GUI that is used to display the items have been bought and sold
+     */
     public static void SaleHistory() throws SQLException {
 
         String team = Team;
@@ -395,9 +451,8 @@ public class ClientGUI {
         //JPanel teamitempanel = new JPanel();
         //frame.add(teamitempanel);
 
-
-        int num = DBConnect.numShopRows(connection);
-        num = 4;
+        int num = DBConnect.getNumHistoryItems(connection);
+        //num = 4;
         JPanel teamsitems = new JPanel(new GridLayout(num, 1));
         JScrollPane teamsitemsscroll = new JScrollPane(teamsitems);
 
@@ -410,8 +465,22 @@ public class ClientGUI {
         JLabel[] assetname = new JLabel[num];
         Dimension saleitem = new Dimension(350, 45);
 
+        if (num == 0){
 
-        for (int i = 0; i < 4; i++) {
+
+            String alltogether = ("There has not been any purchase yet.");
+            JLabel assetnam = new JLabel(alltogether);
+            Border bline = BorderFactory.createLineBorder(Color.black);
+            JPanel itempan = new JPanel();
+            itempan.setBorder(bline);
+            itempan.add(assetnam);
+            itempan.setPreferredSize(saleitem);
+            teamsitems.add(itempan);
+
+
+        }
+
+        for (int i = 0; i < num; i++) {
 
             String itemTeam = DBConnect.getNthTeam(connection,i+1 );
 
@@ -443,6 +512,10 @@ public class ClientGUI {
 
     }
 
+
+    /**
+     * Main is used to launch showClientGUI for testing, normally it will launch on user login
+     */
     public static void main(String[] args) throws SQLException {
         String userName = "bob_smith";
 
@@ -457,6 +530,10 @@ public class ClientGUI {
 
     }
 
+    /**
+     * ComboListener implements ActionListener and is used to get the values of the combo boxes used in
+     * the various GUIs
+     */
     private static class ComboListener implements ActionListener{
 
 
@@ -486,7 +563,11 @@ public class ClientGUI {
 
         }
     }
-    
+
+    /**
+     * ButtonListener implements ActionListener and is used to get the Button presses from Button
+     * used in the various GUIs
+     */
     private static class ButtonListener implements ActionListener {
 
         public void addUSer(ActionEvent e) throws SQLException {
@@ -536,6 +617,7 @@ public class ClientGUI {
                 System.out.println("refreshed");
                 try {
                     refreshShop( connection, intePanel);
+                    //refreshShop( connection, intePanel);
                 } catch (SQLException throwables) {
 
                 }
@@ -595,6 +677,7 @@ public class ClientGUI {
                 String assetprice = Price.getText();
                 String ammount = quantity.getText();
 
+                int howmuch = Integer.parseInt(assetprice);
                 int howmany = Integer.parseInt(ammount);
 
                 if(assname == null){
@@ -607,12 +690,14 @@ public class ClientGUI {
                     JOptionPane.showMessageDialog(null, "You do not have " + assname +" to sell");
                 }else if(( buyorsell.equals("SELL"))&&!(DBConnect.getNumofATeamAsset(connection, teamop, assname, howmany))){
                     JOptionPane.showMessageDialog(null, "You do not have enough " + assname +" to sell, try again");
+                }else if(( buyorsell.equals("BUY"))&&(getCredits(connection,teamop)<howmuch*howmany)){
+                    JOptionPane.showMessageDialog(null, "You do not have enough credits to buy " + assname + " x " + howmany + " for " + howmuch + " per unit, your team has " + getCredits(connection,teamop) + " credit.");
                 }else{
                     System.out.println("new sale created " + assname + " " + bors + " " + tea + " " + assetprice);
                     JOptionPane.showMessageDialog(null, "The "+tea+" team is looking to "+bors+" "+assname+" for C" + assetprice);
                     connection = DBConnect.getInstance();
                     DBConnect.addItemToShop(connection,assname,tea,bors,assetprice,ammount);
-                    assetName.setText(" ");
+                    //assetName.setText(" ");
                     Price.setText(" ");
                     BuyorSell.setSelectedIndex(1);
                     TeamOption.setSelectedIndex(1);
@@ -624,36 +709,12 @@ public class ClientGUI {
         
     }
 
-    public static JMenuBar menuBar(){
-
-        //add basic widow stuff
-        JMenuBar menBar = new JMenuBar();
-        JMenu menu = new JMenu("file");
-        menu.add("open");
-        menu.add("save");
-        menBar.add(menu);
-
-        //JMenuBar men2 = new JMenuBar();
-        JMenu menu2 = new JMenu("Account");
-        menu2.add("open");
-        menu2.add("save");
-        menBar.add(menu2);
-
-        //JMenuBar men3 = new JMenuBar();
-        JMenu menu3 = new JMenu("Team");
-        menu3.add("open");
-        menu3.add("save");
-        menBar.add(menu3);
-
-        //JMenuBar menbar4 = new JMenuBar();
-        JMenu menu4 = new JMenu("Help");
-        menu4.add("open");
-        menu4.add("save");
-        menBar.add(menu4);
-
-        return menBar;
-    }
-
+    /**
+     * Top pannel displays users name, team, credits and permistion level at the top of the page
+     *
+     * @param intePanel the internal Jpanel that the info will be added to
+     * @param UserName the user name is required to quire the data base for info
+     */
     public static void topPanel(JPanel intePanel, String UserName) throws SQLException {
 
 

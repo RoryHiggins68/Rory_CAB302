@@ -4,11 +4,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * The market place class that can will facilitate the buying and selling of assets
+ * The market place class that can will facilitate the buying and selling of assets, it will proses sales
+ * and make checks on teams credits ect
  */
-
 public class Marketplace {
 
+    /**
+     * Creates a connection to the database then runs marketplace used for testing
+     */
     public static void main(String[] args) throws SQLException {
         Connection connection = DBConnect.getInstance();
 
@@ -16,6 +19,7 @@ public class Marketplace {
 
         marketplace(connection);
     }
+
 
 
     public static void marketplace(Connection connection) throws SQLException {
@@ -161,11 +165,31 @@ public class Marketplace {
     }
 
 
+
+
+    /**
+     *  will check if a complete sale can be made or if the seller dose not have enough items or
+     *  the buy dose not have enough credits, this function returns an int representing the number
+     *  of items that can be sold.
+     *
+     * @param connection the connection to the database
+     * @param BuyTeam the team doing the buying
+     * @param cost the cost of the item
+     * @param buyamount how many the buyer wants to buy
+     * @param sellamount the amount the seller wants to sell
+     * @param sellidx
+     *
+     * @return amoutSold the amount that can be sold
+     *
+     */
     public static int saleCheck(Connection connection, String BuyTeam,int cost, int buyamount, int sellamount, int sellidx) throws SQLException {
 
-        int amoutSold = 0;
-        int TeamCreds = DBConnect.getCredits(connection, BuyTeam);
 
+        // how many will sell
+        int amoutSold = 0;
+        // get buyers credits
+        int TeamCreds = DBConnect.getCredits(connection, BuyTeam);
+        // if buyer wants or sell wants more of the item ajust the amount to be sold for the smaller value
         if (buyamount > sellamount){
             amoutSold = sellamount;
         }else if(buyamount < sellamount){
@@ -173,53 +197,74 @@ public class Marketplace {
         }else if(buyamount == sellamount){
             amoutSold = buyamount;
         }
-
+        //get the ammount in the shop
         int inShop = DBConnect.getAmountShop(connection, sellidx);
 
         int i = 0;
         while(i < 1 ){
+            //reduce the ammount sold until the ammount be sold is less than or equile to the amount in shop
             if((amoutSold > inShop)&&(inShop > 0)){
                 amoutSold = amoutSold - 1;
             }else{
                 i = 2;
             }
         }
-
+        //calculate the total cost
         int totalCost = cost * amoutSold;
 
         i = 0;
         while(i < 1 ){
             totalCost = cost * amoutSold;
+            //if the buyer has enough credits and the amount to buy is not zero return amount to be sold
             if((TeamCreds >= totalCost)&&(totalCost > 0)){
 
                 return amoutSold;
-
+            // if amount is zero cancel perchus and return zero
             }else if ((totalCost <= 0)) {
-                return 0;
+                amoutSold = 0;
+                return amoutSold;
+
+            // if buyer dosent have enough credits reduce the buy amount until they do
             }else{
 
                 amoutSold = amoutSold - 1;
 
             }
         }
-
-        return 0;
+        amoutSold = 0;
+        return amoutSold;
 
     }
 
-
+    /**
+     *  subCredits deducts credits from one team and adds them to another, first checks that the buying team
+     *  has enough credits then proses the sale
+     *
+     * @param connection connection to database
+     * @param BuyTeam the team buying the items
+     * @param SellTeam the team selling
+     * @param cost the per unit cost of the asset
+     * @param amount the ammount of the asset being sold
+     *
+     * @return 1 if sale prosesed 0 if insufficient funds
+     */
     public static int subCredits(Connection connection, String BuyTeam,String SellTeam,int cost, int amount) throws SQLException {
 
+        //gets the buy teams credits
         int TeamCreds = DBConnect.getCredits(connection, BuyTeam);
 
+        //gets the total cost of the transaction
         int totalCost = amount * cost;
 
+        //checks if they have enough credits
         if((TeamCreds >= totalCost)&&(!(BuyTeam.equals(SellTeam)))){
 
             DBConnect.addCredits(connection, BuyTeam, -totalCost);
             DBConnect.addCredits(connection, SellTeam, totalCost);
+            //sale processed
             return 1;
         }
+        //not enough credits
         return 0;
     }
 

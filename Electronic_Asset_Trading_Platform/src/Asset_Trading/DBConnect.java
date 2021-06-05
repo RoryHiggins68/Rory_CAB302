@@ -805,9 +805,13 @@ public class DBConnect{
     public static String getShopHisAsset(Connection connection, int Nth ) throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from ShopHistory;");
-
+        String Asset = null;
         for (int i = 0; i < Nth; i++) {resultSet.next();}
-        String Asset = resultSet.getString(2);
+        if(resultSet.isClosed()){
+            Asset = null;
+        }else{
+            Asset = resultSet.getString(2);
+        }
         return Asset;
     }
     public static String getShopHisBuyTeam(Connection connection, int Nth ) throws SQLException {
@@ -1024,8 +1028,34 @@ public class DBConnect{
 
         return rowNum;
     }
-    public static int getCredits(Connection connection, String  Team) throws SQLException {
+    public static int getNumHistoryItems(Connection connection) throws SQLException{
 
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from ShopHistory;");
+
+        resultSet.next();
+        int rowNum =  resultSet.getRow();
+
+        if (rowNum == 0){
+            System.out.println("The num is  " + rowNum);
+        }else{
+            int i = 1;
+            while(i==1){
+                resultSet.next();
+                if (resultSet.getRow() > rowNum){
+                    rowNum = resultSet.getRow();
+                }else{
+                    i = 2;
+                }
+            }
+        }
+
+        return rowNum;
+    }
+
+
+    public static int getCredits(Connection connection, String  Team) throws SQLException {
+    //get the amout of credits a team has
         int cred = 0;
         String credits;
         String currentTeam;
