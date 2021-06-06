@@ -87,9 +87,18 @@ public class DBConnect{
 
     }
     public static Connection getInstance() throws SQLException {
+        if (connection != null) {
+
+            if(connection.isClosed()){
+                connection= null;
+            }
+
+        }
+
+
         if (connection == null) {
             new DBConnect();
-        }
+        }else{System.out.println("Connection not null");}
         return connection;
     }
     public static void getAll(Connection connection) throws SQLException{
