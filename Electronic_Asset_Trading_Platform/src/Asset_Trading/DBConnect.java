@@ -11,8 +11,21 @@ import java.sql.Statement;
 //db pass should be: root
 // server name: MariaDB
 //TCP port:3306
+
+
+/**
+ * The DBConnect class manages all aspects of the databases as well as connections to them
+ * if the have not been created then they will be and there is also code to populate the databases
+ * test information. DBConnect also contains all the required methods needed to querie the data base
+ * for various pieces of information.
+ */
+
 public class DBConnect{
 
+    /**
+     * If the the following tables dont exist the they be created the firt time DBconnection called.
+     */
+    // Creates the user table with all required fields.
     public static final String CREATE_USER_TABLE =
             "CREATE TABLE IF NOT EXISTS Users ("
                     + "idx INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */ NOT NULL UNIQUE," // from https://stackoverflow.com/a/41028314
@@ -22,6 +35,7 @@ public class DBConnect{
                     + "Password VARCHAR(30),"
                     + "Team VARCHAR(30)" + ");";
 
+    // Creates the Asset table with all required fields.
     public static final String CREATE_ASSET_TABLE =
             "CREATE TABLE IF NOT EXISTS Assets ("
                     + "idx INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */ NOT NULL UNIQUE," // from https://stackoverflow.com/a/41028314
@@ -30,6 +44,7 @@ public class DBConnect{
                     + "LowPrice VARCHAR(10),"
                     + "Description VARCHAR(150)" + ");";
 
+    // Creates the shop table with all required fields.
     public static final String CREATE_SHOP_TABLE =
             "CREATE TABLE IF NOT EXISTS Shop ("
                     + "idx INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */ NOT NULL UNIQUE," // from https://stackoverflow.com/a/41028314
@@ -40,7 +55,7 @@ public class DBConnect{
                     + "Amount VARCHAR(10)" +
                     ");";
 
-
+    // Creates the team table with all required fields.
     public static final String CREATE_TEAM_TABLE =
             "CREATE TABLE IF NOT EXISTS Team ("
                     + "idx INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */ NOT NULL UNIQUE," // from https://stackoverflow.com/a/41028314
@@ -48,6 +63,7 @@ public class DBConnect{
                     + "TeamLeader VARCHAR(15),"
                     + "Credits VARCHAR(15)" + ");";
 
+    // Creates the shop history table with all required fields.
     public static final String CREATE_SHOP_HISTORY_TABLE =
             "CREATE TABLE IF NOT EXISTS ShopHistory ("
                     + "idx INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */ NOT NULL UNIQUE," // from https://stackoverflow.com/a/41028314
@@ -59,12 +75,21 @@ public class DBConnect{
 
     private static Connection connection = null;
 
-    //public static void main(String[] args) throws SQLException, IOException {
+    /**
+     * Connects to the database through the driver manager, the calls the createDatabase(connection);
+     * if the database have not been created this will create them, next it will check if data bases
+     * are empty if they are it will populate them with test data.
+     *
+     * @throws SQLException
+     */
     public DBConnect() throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite:asset_trading.db", "", "");
 
         createDatabase(connection);
         int num = numShopRows(connection);
+
+
+
         if (num == 0){
             System.out.println("the number of rows is " + num + " database needs populating");
         }else{
@@ -86,6 +111,13 @@ public class DBConnect{
 
 
     }
+
+    /**
+     * creates a new database connection and returns it.
+     *
+     * @return Connection to the database
+     * @throws SQLException
+     */
     public static Connection getInstance() throws SQLException {
         if (connection != null) {
 
@@ -94,13 +126,13 @@ public class DBConnect{
             }
 
         }
-
-
         if (connection == null) {
             new DBConnect();
         }else{System.out.println("Connection not null");}
         return connection;
     }
+
+    /*
     public static void getAll(Connection connection) throws SQLException{
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from Shop;");
@@ -129,6 +161,13 @@ public class DBConnect{
         System.out.println("The "+Team+" team is looking to "+BuyOrSell+" "+Asset+" for C" + Price);
 
     }
+    */
+
+    /**
+     * This will populate the user table and the teams table of the database.
+     * @param connection a connection to the database.
+     * @throws SQLException
+     */
     public static void AddUserandTeams(Connection connection) throws SQLException{
 
 
@@ -213,6 +252,40 @@ public class DBConnect{
 
 
     }
+
+
+    /**
+     *      * Adds a team to the team database  and adds a user to be the leader of the team.
+     * @param connection a connection to the database.
+     * @param TeamName The Name of the new team
+     * @param TeamLeader THe Leader of the team
+     * @param Credits the amount of credits the team has
+     * @throws SQLException
+     */
+    public static void addTeam(Connection connection, String TeamName, String TeamLeader, String Credits) throws SQLException {
+
+        String INSERT_TEAM = "INSERT INTO Team (TeamName, TeamLeader, Credits) VALUES (?, ?, ?);";
+
+        PreparedStatement addTeam = connection.prepareStatement(INSERT_TEAM);
+
+        addTeam.setString(1, TeamName);
+        addTeam.setString(2, TeamLeader);
+        addTeam.setString(3, Credits);
+
+        if(userExists(connection, TeamLeader)){
+            addTeam.execute();
+        }else{
+            System.out.println("No such user ");
+        }
+
+    }
+
+    /**
+     * Populates some of the databases with test data, the asset, shop and the teams databases will
+     * be populated.
+     * @param connection a connection to the database.
+     * @throws SQLException
+     */
     public static void PopulateDatabase(Connection connection) throws SQLException{
 
         String AssetName = "CPU Time";
@@ -410,15 +483,15 @@ public class DBConnect{
         addItemToShop(connection, Asset, TeamRequest, BuyOrSell, Price,Amount);
 
 
-/*
-        addAssetToTeam(connection,"A", "Computer", 50);
-        addAssetToTeam(connection,"C", "Computer", 4);
-        addAssetToTeam(connection,"B", "Printing", 10);
-        addAssetToTeam(connection,"A", "CPU Time", 5);*/
-
-
 
     }
+
+    /**
+     * Creates all the database if they already exsist they will not be recreated, the calls
+     * createTeamsDatabase(connection);
+     * @param connection a connection to the database.
+     * @throws SQLException
+     */
     public static void createDatabase(Connection connection) throws SQLException {
 
         Statement st = connection.createStatement();
@@ -432,20 +505,44 @@ public class DBConnect{
 
 
     }
+
+    /**
+     * Adds a new asset to the asset database
+     *
+     * @param connection  a connection to the database.
+     * @param AssetName The name of the new asset
+     * @param HighPrice The high of the asset
+     * @param LowPrice The low price of the asset
+     * @param Description A description of the asset
+     * @throws SQLException
+     */
     public static void addAsset(Connection connection,String AssetName, String HighPrice, String LowPrice, String Description) throws SQLException {
+
+        //prepares the sql string
         String INSERT_ASSET = "INSERT INTO Assets (AssetName, HighPrice, LowPrice, Description) VALUES (?, ?, ?, ?);";
 
         PreparedStatement addAsset = connection.prepareStatement(INSERT_ASSET);
 
+        // adds parameters
         addAsset.setString(1, AssetName);
         addAsset.setString(2, HighPrice);
         addAsset.setString(3, LowPrice);
         addAsset.setString(4, Description);
 
-
+        //execute
         addAsset.execute();
 
     }
+    /**
+     * Adds a new sale to the shop
+     * @param connection a connection to the database.
+     * @param Asset assets name
+     * @param TeamRequest The team making the request
+     * @param BuyOrSell is it a buy or sell request
+     * @param Price what the price is
+     * @param Amount How many
+     * @throws SQLException
+     */
     public static void addItemToShop(Connection connection,String Asset, String TeamRequest, String BuyOrSell, String Price, String Amount) throws SQLException{
         String INSERT_SHOPITEM = "INSERT INTO Shop (Asset, TeamRequest, BuyOrSell, Price, Amount) VALUES (?, ?, ?, ?, ?);";
         PreparedStatement addShopItem = connection.prepareStatement(INSERT_SHOPITEM);
@@ -460,6 +557,12 @@ public class DBConnect{
         addShopItem.execute();
 
     }
+    /**
+     *add a new user to the data takes a user calss object as input
+     * @param connection a connection to the database.
+     * @param U The user object that is being added
+     * @throws SQLException
+     */
     public static void addUser(Connection connection, User U) throws SQLException{
 
         String INSERT_USER = "INSERT INTO Users (FirstName, LastName, UserName, Password, Team) VALUES (?, ?, ?, ?, ?);";
@@ -476,6 +579,17 @@ public class DBConnect{
 
 
     }
+
+    /**
+     * Adds a new user to the user data base, is call buy the add user gui, takes user info as input
+     * @param connection a connection to the database.
+     * @param firstName users firts name
+     * @param lastName users last name
+     * @param Username the uername they will login with
+     * @param Password the users password
+     * @param Team the team the user is part of
+     * @throws SQLException
+     */
     public static void addUser(Connection connection, String firstName, String lastName, String Username, String Password, String Team) throws SQLException {
 
 
@@ -493,23 +607,18 @@ public class DBConnect{
         addUser.execute();
 
     }
-    public static void addTeam(Connection connection, String TeamName, String TeamLeader, String Credits) throws SQLException {
 
-        String INSERT_TEAM = "INSERT INTO Team (TeamName, TeamLeader, Credits) VALUES (?, ?, ?);";
-
-        PreparedStatement addTeam = connection.prepareStatement(INSERT_TEAM);
-
-        addTeam.setString(1, TeamName);
-        addTeam.setString(2, TeamLeader);
-        addTeam.setString(3, Credits);
-
-        if(userExists(connection, TeamLeader)){
-            addTeam.execute();
-        }else{
-            System.out.println("No such user ");
-        }
-
-    }
+    /**
+     * when a sale is prossesed in the shop the item is moved to the shop history data base so user can see the price
+     * history and what items are selling well
+     *
+     * @param connection a connection to the database.
+     * @param Asset  the asset name
+     * @param BuyTeam the buyer
+     * @param SellTeam the seller
+     * @param Price the price
+     * @throws SQLException
+     */
     public static void addShopHistoryItem(Connection connection, String Asset, String BuyTeam, String SellTeam, String Price) throws SQLException {
         String INSERT_SHOPHISTORY = "INSERT INTO ShopHistory (Asset, BuyTeam, SellTeam, Price) VALUES (?, ?, ?, ?);";
 
@@ -521,12 +630,33 @@ public class DBConnect{
         addShopHistoryItem.setString(4, Price);
         addShopHistoryItem.execute();
     }
+
+    /**
+     * Removes a item from the shop one the sale has been prossesed
+     * @param connection a connection to the database.
+     * @param index the database index of the item.
+     * @throws SQLException
+     */
     public static void removeItemFromShop(Connection connection, int index) throws SQLException{
 
         PreparedStatement statement = connection.prepareStatement("DELETE FROM Shop WHERE idx = ? ;");
         statement.setInt(1,index);
         statement.executeUpdate();
     }
+
+    /**
+     * Used when a request is not fully completed in the case were one or the other team dose not have enough credits
+     * or enough of an asset to fulfill the request. in the case the amount that can be sold is passed here and then
+     * this function will edit the shop requests by reducing the price and the buy and sell amounts by the amount and
+     * then the request are put back in the store.
+     *
+     *
+     * @param connection a connection to the database.
+     * @param indexbuy index of the buy request in the shop database
+     * @param indexsell index of the Sell request in the shop database
+     * @param amountToBeSold how man will be sold
+     * @throws SQLException
+     */
     public static void deductItemsFromShop(Connection connection, int indexbuy, int indexsell, int amountToBeSold) throws SQLException{
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -582,6 +712,15 @@ public class DBConnect{
         }
 
     }
+
+
+    /**
+     * Adds or deducts credits from a team, used when sales are processed
+     * @param connection a connection to the database.
+     * @param Team the whos credits will be edited
+     * @param amount the amount of credits
+     * @throws SQLException
+     */
     public static void addCredits(Connection connection, String  Team, int amount) throws SQLException {
         int index;
         int cred;
@@ -610,6 +749,14 @@ public class DBConnect{
             }
         }
     }
+
+    /**
+     * creates team databases that will stor the assets that a team has and how many they have. This function
+     * will go through the teams databas and for every team create the a database.
+     *
+     * @param connection a connection to the database.
+     * @throws SQLException
+     */
     public static void createTeamsDatabase(Connection connection) throws SQLException {
 
         int numteams = getNumTeams(connection);
@@ -630,6 +777,15 @@ public class DBConnect{
         }
 
     }
+
+    /**
+     * adds assets to a teams database use to populate and when a team makes a successful buy request
+     * @param connection a connection to the database.
+     * @param team the team have assets added
+     * @param asset the asset being added
+     * @param amount how many of the asset
+     * @throws SQLException
+     */
     public static void addAssetToTeam(Connection connection,String team, String asset, int amount) throws SQLException {
 
         PreparedStatement addAsset = null;
@@ -680,6 +836,13 @@ public class DBConnect{
 
     }
 
+    /**
+     * returns the idx of the nth asset in the shop
+     * @param connection a connection to the database.
+     * @param Nth number representing the nth asset
+     * @return a string representing the inx of that item
+     * @throws SQLException
+     */
     public static String getShopidx(Connection connection, int Nth ) throws SQLException{
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from Shop;");
@@ -693,18 +856,20 @@ public class DBConnect{
 
         for (int i = 0; i < Nth; i++) {
             resultSet.next();
-//            String indx = resultSet.getString(1);
-//            String N = String.valueOf(Nth);
-//
-//            if(indx.equals(N)){
-//                i = Nth;
-//            }
         }
 
 
         String idx = resultSet.getString(1);
         return idx;
     }
+
+    /** Gets the nth asset in the shop database
+     *
+     * @param connection  a connection to the database.
+     * @param Nth the shop databas index
+     * @return the asset name
+     * @throws SQLException
+     */
     public static String getNthAsset(Connection connection, int Nth ) throws SQLException{
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from Shop;");
@@ -730,6 +895,14 @@ public class DBConnect{
         String Asset = resultSet.getString(2);
         return Asset;
     }
+
+    /** Returns the team the is making the nth shop request in the shop database
+     *
+     * @param connection a connection to the database.
+     * @param Nth the request number
+     * @return returns the team
+     * @throws SQLException
+     */
     public static String getNthShopTeam(Connection connection, int Nth ) throws SQLException{
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -740,6 +913,14 @@ public class DBConnect{
         String Team = resultSet.getString(3);
         return Team;
     }
+
+    /**
+     * Returns the nth team in the team database
+     * @param connection a connection to the database.
+     * @param Nth the number of the team
+     * @return the team
+     * @throws SQLException
+     */
     public static String getNthTeam(Connection connection, int Nth ) throws SQLException{
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -755,6 +936,14 @@ public class DBConnect{
         String Team = resultSet.getString(2);
         return Team;
     }
+
+    /**
+     * get request type of the nth request of in the shop database
+     * @param connection a connection to the database.
+     * @param Nth the number of the request
+     * @return buy or sell depending on the request type
+     * @throws SQLException
+     */
     public static String getNthBuyOrSell(Connection connection, int Nth ) throws SQLException{
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from Shop;");
@@ -765,6 +954,14 @@ public class DBConnect{
         String BuyOrSell = resultSet.getString(4);
         return BuyOrSell;
     }
+
+    /**
+     * Get the price of the nth request int the shop database
+     * @param connection a connection to the database.
+     * @param Nth the number of the item
+     * @return the price
+     * @throws SQLException
+     */
     public static String getNthPrice(Connection connection, int Nth ) throws SQLException{
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from Shop;");
@@ -775,7 +972,15 @@ public class DBConnect{
         String Price = resultSet.getString(5);
         return Price;
     }
-    public static String getNth(Connection connection, int Nth ) throws SQLException{
+
+    /**
+     *
+     * @param connection a connection to the database.
+     * @param Nth
+     * @return
+     * @throws SQLException
+     */
+  /*  public static String getNth(Connection connection, int Nth ) throws SQLException{
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from Shop;");
 
@@ -791,6 +996,15 @@ public class DBConnect{
 
         return Asset;
     }
+*/
+
+    /**
+     *Gets the team that the user is a part of
+     * @param connection a connection to the database.
+     * @param UserName the user we want to know the team of
+     * @return the team name
+     * @throws SQLException
+     */
     public static String getTeam(Connection connection, String  UserName) throws SQLException {
 
         String team = " ";
@@ -811,6 +1025,14 @@ public class DBConnect{
         return team;
 
     }
+
+    /**
+     * get the nth item in the shop history database
+     * @param connection a connection to the database.
+     * @param Nth the number of the item
+     * @return the asset
+     * @throws SQLException
+     */
     public static String getShopHisAsset(Connection connection, int Nth ) throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from ShopHistory;");
@@ -823,6 +1045,14 @@ public class DBConnect{
         }
         return Asset;
     }
+
+    /**
+     * get the buy team of the nth shop history item
+     * @param connection a connection to the database.
+     * @param Nth item number
+     * @return the buy team name
+     * @throws SQLException
+     */
     public static String getShopHisBuyTeam(Connection connection, int Nth ) throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from ShopHistory;");
@@ -832,6 +1062,14 @@ public class DBConnect{
         return BuyTeam;
 
     }
+
+    /**
+     *
+     * @param connection a connection to the database.
+     * @param Nth
+     * @return
+     * @throws SQLException
+     */
     public static String getShopHisSellTeam(Connection connection, int Nth ) throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from ShopHistory;");
@@ -840,6 +1078,14 @@ public class DBConnect{
         String SellTeam = resultSet.getString(4);
         return SellTeam;
     }
+
+    /**
+     * Get the sell team of the nth shop history item
+     * @param connection a connection to the database.
+     * @param Nth item number
+     * @return the sell team name
+     * @throws SQLException
+     */
     public static String getShopHisPrice(Connection connection, int Nth )throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from ShopHistory;");
@@ -848,6 +1094,14 @@ public class DBConnect{
         String Price = resultSet.getString(5);
         return Price;
     }
+
+    /**
+     * get the nth asset from the asset database
+     * @param connection a connection to the database.
+     * @param Nth asset number
+     * @return the asset
+     * @throws SQLException
+     */
     public static String getnthAssetfromAssetsTable(Connection connection, int Nth ) throws SQLException{
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from Assets;");
@@ -866,32 +1120,13 @@ public class DBConnect{
         return Asset;
     }
 
-    public static boolean getNumofATeamAsset(Connection connection, String team, String asset, int howmany) throws SQLException {
-
-        int num = 0;
-
-        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-        ResultSet resultSet = statement.executeQuery("select * from TEAM_" + team + "_Assets;");
-
-        int numAssets = getNumTeamAssets(connection ,team);
-        int amount = 0;
-        boolean result = false ;
-
-        for(int i = 0; i < numAssets; i++){
-            resultSet.next();
-            String entry = resultSet.getString(2);
-            if(asset.equals(entry)){
-                amount = Integer.parseInt(resultSet.getString(3));
-                i = numAssets + 1;
-            }
-        }
-        if(amount > howmany){
-            result = true;
-        }
-
-        return result;
-
-    }
+    /**
+     *  get the number of assets that the team has.
+     * @param connection a connection to the database.
+     * @param team the team
+     * @return number of different assets
+     * @throws SQLException
+     */
     public static int getNumTeamAssets(Connection connection, String team) throws SQLException {
 
         int num = 0;
@@ -919,6 +1154,14 @@ public class DBConnect{
         return rowNum;
 
     }
+
+    /**
+     * Get the amount of an asset being requested in a shop request for the asset at database inx
+     * @param connection a connection to the database.
+     * @param index the data base index of the asset
+     * @return the amount of a asset being requested
+     * @throws SQLException
+     */
     public static int getAmountShop(Connection connection, int index) throws SQLException {
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -941,6 +1184,13 @@ public class DBConnect{
         return Amount;
 
     }
+
+    /**
+     * Gets the number of users in the users database
+     * @param connection a connection to the database.
+     * @return the number of users in the users database
+     * @throws SQLException
+     */
     public static int getNumUsers(Connection connection) throws SQLException{
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -965,6 +1215,13 @@ public class DBConnect{
 
         return rowNum;
     }
+
+    /**
+     * Get the number of teams in the Teams database
+     * @param connection a connection to the database.
+     * @return the number of teams in the Teams database
+     * @throws SQLException
+     */
     public static int getNumTeams(Connection connection) throws SQLException{
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -989,6 +1246,13 @@ public class DBConnect{
 
         return rowNum;
     }
+
+    /**
+     * Gets the number of assets stored in the assets database
+     * @param connection a connection to the database.
+     * @return the number of assets stored in the assets database
+     * @throws SQLException
+     */
     public static int getNumAssets(Connection connection) throws SQLException{
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -1013,6 +1277,7 @@ public class DBConnect{
 
         return rowNum;
     }
+
     public static int getHistoryItems(Connection connection) throws SQLException{
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -1037,6 +1302,13 @@ public class DBConnect{
 
         return rowNum;
     }
+
+    /**
+     * the number of items in the shop history database
+     * @param connection a connection to the database.
+     * @return number of items in the shop history database
+     * @throws SQLException
+     */
     public static int getNumHistoryItems(Connection connection) throws SQLException{
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -1062,7 +1334,13 @@ public class DBConnect{
         return rowNum;
     }
 
-
+    /**
+     * get the number of credits that a team has
+     * @param connection a connection to the database.
+     * @param Team the team whos credis we are checking
+     * @return number of credits
+     * @throws SQLException
+     */
     public static int getCredits(Connection connection, String  Team) throws SQLException {
     //get the amout of credits a team has
         int cred = 0;
@@ -1084,6 +1362,13 @@ public class DBConnect{
         }
         return cred;
     }
+
+    /**
+     *get the number of rows in the shop database and return it
+     * @param connection a connection to the database.
+     * @return the number of rows in the shop
+     * @throws SQLException
+     */
     public static int numShopRows(Connection connection) throws SQLException{
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from Shop;");
@@ -1108,6 +1393,16 @@ public class DBConnect{
         return rowNum;
 
     }
+
+    /**
+     * Checks the user name and password provided with the name and passwords stored in the user database if the
+     * username matches check the passwords if ether dont match then login fails
+     * @param connection a connection to the database.
+     * @param UserName the user name to checked
+     * @param Password the password to be checked
+     * @return 1 if the credentuals match 0 if not
+     * @throws SQLException
+     */
     public static int UserLogin(Connection connection, String UserName, String Password ) throws SQLException {
 
         int login = 0;
@@ -1140,6 +1435,50 @@ public class DBConnect{
 
     }
 
+    /**
+     * checks if the team has more than or the same amount of an asset as the number howmany if there are then it will
+     * return true
+     * @param connection a connection to the database.
+     * @param team the whos assets we are checking
+     * @param asset the asset that we are checking the amount of
+     * @param howmany how they need to have more than
+     * @return True if the number of assets the team has is greater than or equal to howmany
+     * @throws SQLException
+     */
+    public static boolean getNumofATeamAsset(Connection connection, String team, String asset, int howmany) throws SQLException {
+
+        int num = 0;
+
+        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("select * from TEAM_" + team + "_Assets;");
+
+        int numAssets = getNumTeamAssets(connection ,team);
+        int amount = 0;
+        boolean result = false ;
+
+        for(int i = 0; i < numAssets; i++){
+            resultSet.next();
+            String entry = resultSet.getString(2);
+            if(asset.equals(entry)){
+                amount = Integer.parseInt(resultSet.getString(3));
+                i = numAssets + 1;
+            }
+        }
+        if(amount > howmany){
+            result = true;
+        }
+
+        return result;
+
+    }
+
+    /**
+     * check if the user exists in the user database
+     * @param connection  a connection to the database.
+     * @param UserName the user we are checking for
+     * @return returns true if user exists
+     * @throws SQLException
+     */
     public static boolean userExists(Connection connection, String UserName) throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = statement.executeQuery("select * from Users;");
@@ -1157,6 +1496,14 @@ public class DBConnect{
 
         return isIn;
     }
+
+    /**
+     * checks if a user is the team leader, used to check if they are allowed to do sertain things like add new users
+     * @param connection  a connection to the database.
+     * @param UserName the name of the user being checked
+     * @return True if user is a team leader
+     * @throws SQLException
+     */
     public static boolean isTeamLeader(Connection connection, String UserName) throws SQLException {
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -1174,6 +1521,15 @@ public class DBConnect{
         }
         return isLeader;
     }
+
+    /**
+     * checks if a team has a particular asset
+     * @param connection a connection to the database.
+     * @param team the team be checked
+     * @param Asset the asset being checked for
+     * @return true if the team has the asset and false if the team dose not
+     * @throws SQLException
+     */
     public static boolean TeamHasAsset(Connection connection, String team, String Asset) throws SQLException {
 
         Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);

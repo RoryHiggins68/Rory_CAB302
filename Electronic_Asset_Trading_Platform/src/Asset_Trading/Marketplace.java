@@ -29,9 +29,9 @@ public class Marketplace {
 
             System.out.println(new Date());
             Thread.sleep((long) ((60 * MINUTES) * 1000));
-            Connection connection = DBConnect.getInstance();
-            marketplace(connection);
-            connection.close();
+            Connection connectionmarket = DBConnect.getInstance();
+            marketplace(connectionmarket);
+            connectionmarket.close();
 
         }
     }

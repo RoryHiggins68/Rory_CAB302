@@ -1,8 +1,10 @@
-package Asset_Trading;
+/*
 
+*/
 /**
  * A generic asset class that can be subclasses for what ever assets are needed
- */
+ *//*
+
 
 public abstract class Assets {
 
@@ -16,3 +18,4 @@ public abstract class Assets {
         this.assetName = assetName;
     }
 }
+*/

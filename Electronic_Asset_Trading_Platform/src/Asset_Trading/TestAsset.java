@@ -1,9 +1,9 @@
-import Asset_Trading.Assets;
+/*import Asset_Trading.Assets;
 
-/**
+*//**
  * A test implementation of assets
  *
- */
+ *//*
 
 public class TestAsset extends Assets {
 
@@ -15,5 +15,5 @@ public class TestAsset extends Assets {
 
 
 
-}
+}*/
 

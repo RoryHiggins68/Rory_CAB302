@@ -737,6 +737,7 @@ public class ClientGUI {
                 int howmuch = Integer.parseInt(assetprice);
                 int howmany = Integer.parseInt(ammount);
 
+                Connection connection6 = DBConnect.getInstance();
 
                 //check that all info has been entered if not prompt the user
                 if(assname == null){
@@ -746,16 +747,20 @@ public class ClientGUI {
                 }else if(assname == null || bors == null || tea == null || assetprice == null){
                     JOptionPane.showMessageDialog(null, "Please check the values entered something has been left null");
 
-                //
-                }else if(( buyorsell.equals("SELL"))&&!(DBConnect.TeamHasAsset(connection,teamop,assetop))){
+                //if the item selling make sure tean has the asset and that they have enough of it.
+                }else if(( buyorsell.equals("SELL"))&&!(DBConnect.TeamHasAsset(connection6,teamop,assetop))){
                     JOptionPane.showMessageDialog(null, "You do not have " + assname +" to sell");
-                }else if(( buyorsell.equals("SELL"))&&!(DBConnect.getNumofATeamAsset(connection, teamop, assname, howmany))){
+                }else if(( buyorsell.equals("SELL"))&&!(DBConnect.getNumofATeamAsset(connection6, teamop, assname, howmany))){
                     JOptionPane.showMessageDialog(null, "You do not have enough " + assname +" to sell, try again");
-                }else if(( buyorsell.equals("BUY"))&&(getCredits(connection,teamop)<howmuch*howmany)){
+
+                // If a buy request is being posted check they have enough credits to do so.
+                }else if(( buyorsell.equals("BUY"))&&(getCredits(connection6,teamop)<howmuch*howmany)){
                     JOptionPane.showMessageDialog(null, "You do not have enough credits to buy " + assname + " x " + howmany + " for " + howmuch + " per unit, your team has " + getCredits(connection,teamop) + " credit.");
                 }else{
-                    System.out.println("new sale created " + assname + " " + bors + " " + tea + " " + assetprice);
-                    JOptionPane.showMessageDialog(null, "The "+tea+" team is looking to "+bors+" "+assname+" for C" + assetprice);
+
+                // All tests pass post sale
+                    System.out.println("new sale created " + assname + " X " + howmany  + bors + " " + tea + " " + assetprice);
+                    JOptionPane.showMessageDialog(null, "The "+tea+" team is looking to "+bors+" "+assname+ " X " + howmany  +" for C" + assetprice);
                     connection = DBConnect.getInstance();
                     DBConnect.addItemToShop(connection,assname,tea,bors,assetprice,ammount);
                     //connection.close();
@@ -765,7 +770,7 @@ public class ClientGUI {
                     TeamOption.setSelectedIndex(1);
 
                 }
-                //connection.close();
+                connection6.close();
             }
         }
         
