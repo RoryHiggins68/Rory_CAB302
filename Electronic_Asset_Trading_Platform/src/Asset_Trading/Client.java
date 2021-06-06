@@ -8,13 +8,12 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
-import java.sql.SQLException;
 
 
+/**
+ * This the users client that will allow them to access the system by logging
+ * in with their user credentials.
+ */
 
 public class Client {
 
@@ -23,7 +22,6 @@ public class Client {
     private static JTextField UserName;
     private static JTextField Password;
     private static Client loginClient;
-
 
 
     public static void main(String[] args) throws IOException, SQLException {

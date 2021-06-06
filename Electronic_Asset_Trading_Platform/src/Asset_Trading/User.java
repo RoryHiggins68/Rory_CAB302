@@ -2,13 +2,9 @@ package Asset_Trading;
 
 /**
  * A class representing the individual users within the organisation
- *
- *
- //* @param firstName the users first name
- //* @param lastName the users last name
- //* @param userName the user name for logging in to the market place
- //* @param team the team that this user is a part of
  */
+
+
 
 public class User {
 

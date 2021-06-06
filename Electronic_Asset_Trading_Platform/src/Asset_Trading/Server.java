@@ -6,7 +6,11 @@ import java.net.Socket;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-
+/**
+ * The server that will link the users client to the system via the server
+ * it will facilitate the conection over tcp/ip
+ *
+ */
 
 public class Server {
 

@@ -132,36 +132,6 @@ public class DBConnect{
         return connection;
     }
 
-    /*
-    public static void getAll(Connection connection) throws SQLException{
-        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-        ResultSet resultSet = statement.executeQuery("select * from Shop;");
-
-        resultSet.next();
-        while (resultSet.next()){
-
-            String Asset = resultSet.getString(2);
-            String Price = resultSet.getString(5);
-
-            System.out.println(Asset + ": $" + Price);
-        }
-
-    }
-    public static void printNth(Connection connection, int Nth ) throws SQLException{
-        Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-        ResultSet resultSet = statement.executeQuery("select * from Shop;");
-
-        for (int i = 0; i < Nth; i++) {resultSet.next();}
-
-        String Asset = resultSet.getString(2);
-        String Team =  resultSet.getString(3);
-        String BuyOrSell =  resultSet.getString(4);
-        String Price = resultSet.getString(5);
-
-        System.out.println("The "+Team+" team is looking to "+BuyOrSell+" "+Asset+" for C" + Price);
-
-    }
-    */
 
     /**
      * This will populate the user table and the teams table of the database.

@@ -38,6 +38,26 @@ public class Marketplace {
 
 
     /**
+     * Creates a connection to the database then will run marketplace every minute to check for matching sales
+     * This can be changed be changing MINUTES to make the check more or less frequent, can be 0.5 for 30 seconds
+     * or 10 for ten minutes. This will continue to run until stoped
+     */
+    public static void Start() throws SQLException, InterruptedException {
+
+        int i = 1;
+        while(i == 1){
+
+            System.out.println(new Date());
+            Thread.sleep((long) ((60 * MINUTES) * 1000));
+            Connection connectionmarket = DBConnect.getInstance();
+            marketplace(connectionmarket);
+            connectionmarket.close();
+
+        }
+    }
+
+
+    /**
      * The market place will query the dataase for an item from the store and then it will query for a second item
      * it will then compare these two item and see if they are are the same asset, one is buying one is selling that
      * they are posted by different teams and that the prices are the same or within 20% percent of each other,

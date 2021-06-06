@@ -411,6 +411,8 @@ public class ClientGUI {
 
         Connection connection2 = DBConnect.getInstance();
         int num = DBConnect.numShopRows(connection2);
+        //int num = DBConnect.getNumTeamAssets(connection2, Team);
+
         //connection.close();
 
         //crate a scroll panel and add it to the frame
@@ -426,20 +428,22 @@ public class ClientGUI {
         Dimension saleitem = new Dimension(350, 45);
 
       // for every item in the shop that has been posted by this team display itin the GUI
-        connection = DBConnect.getInstance();
+        //connection = DBConnect.getInstance();
         for (int i = 0; i < num; i++) {
 
-            String itemTeam = DBConnect.getNthTeam(connection,i+1 );
+            String itemTeam = DBConnect.getNthShopTeam(connection2,i+1 );
+            ///String itemTeam = DBConnect.getNthTeam(connection2,i+1 );
+           // String itemTeam =DBConnect.getNthAsset(connection2,i+1 );
             //connection.close();
 
             //if (itemTeam == team){
             if (itemTeam.equals(team)){
 
                 itempanels[i] = new JPanel();
-                String Asset = DBConnect.getNthAsset(connection,i+1 );
-                String Team = DBConnect.getNthTeam(connection,i+1 );
-                String BuyOrSell = DBConnect.getNthBuyOrSell(connection,i+1);
-                String Price = DBConnect.getNthPrice(connection,i+1);
+                String Asset = DBConnect.getNthAsset(connection2,i+1 );
+                String Team = team;//DBConnect.getNthTeam(connection2,i+1 );
+                String BuyOrSell = DBConnect.getNthBuyOrSell(connection2,i+1);
+                String Price = DBConnect.getNthPrice(connection2,i+1);
 
                 String alltogether = ("The "+Team+" team is looking to "+BuyOrSell+" "+Asset+" for " + Price +" Credits");
                 assetname[i] = new JLabel(alltogether);
